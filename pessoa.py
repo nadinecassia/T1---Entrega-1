@@ -20,15 +20,15 @@ class Pessoa(ABC):
     def celular(self):
         return self.__celular
     
-     @nome.setter
-    def nome(self, nome):
+    @nome.setter
+    def nome(self, nome:str) -> None:
         self.__nome = nome
     
     @cpf.setter
-    def cpf(self, cpf):
+    def cpf(self, cpf:str) -> None:
         self.__cpf = cpf
 
     @celular.setter
-    def celular(self, celular):
+    def celular(self, celular:str) -> None:
         self.__celular = celular
     
