@@ -12,5 +12,9 @@ class Pix(Pagamento):
         return self.__cpf_pagador
 
     @cpf_pagador.setter
-    def cpf_pagador(self, cpf_pagador):
+    def cpf_pagador(self, cpf_pagador) -> None:
         self.__cpf_pagador = cpf_pagador
+
+    def processar_pagamento(self) -> None:
+        print('Pagamento via Pix está sendo processado')
+        
