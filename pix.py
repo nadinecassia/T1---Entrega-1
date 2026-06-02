@@ -10,7 +10,7 @@ class Pix(Pagamento):
     @property
     def cpf_pagador(self):
         return self.__cpf_pagador
-    
+
     @cpf_pagador.setter
     def cpf_pagador(self, cpf_pagador):
         self.__cpf_pagador = cpf_pagador
