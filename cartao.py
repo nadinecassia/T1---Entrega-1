@@ -25,3 +25,6 @@ class Cartao(Pagamento):
     @bandeira.setter
     def bandeira(self, bandeira) -> None:
         self.__bandeira = bandeira
+
+    def processar_pagamento(self) -> None:
+        print("Pagamento via cartão está sendo processado")
