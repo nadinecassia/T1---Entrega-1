@@ -1,11 +1,14 @@
-from profissional import Profissional
+from entidade.profissional import Profissional
 
-class Procedimento():
-    def __init__(self, descricao: str, custo: float, profissional: Profissional) -> None:
+
+class Procedimento:
+    def __init__(
+        self, descricao: str, custo: float, profissional: Profissional
+    ) -> None:
         self.__descricao = descricao
         self.__custo = custo
         self.__profissional = profissional
-    
+
     @property
     def descricao(self):
         return self.__descricao
@@ -13,7 +16,7 @@ class Procedimento():
     @descricao.setter
     def descricao(self, descricao):
         self.__descricao = descricao
-    
+
     @property
     def custo(self):
         return self.__custo
@@ -21,7 +24,7 @@ class Procedimento():
     @custo.setter
     def custo(self, custo):
         self.__custo = custo
-    
+
     @property
     def profissional(self):
         return self.__profissional

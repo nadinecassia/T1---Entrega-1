@@ -1,5 +1,5 @@
 from datetime import date
-from pagamento import Pagamento
+from entidade.pagamento import Pagamento
 
 
 class Pix(Pagamento):
@@ -16,4 +16,6 @@ class Pix(Pagamento):
         self.__cpf_pagador = cpf_pagador
 
     def processar_pagamento(self) -> None:
-        print("Pagamento via Pix está sendo processado")
+        print(
+            f"Pagamento via PIX está sendo processado. CPF do pagador: {self.__cpf_pagador}"
+        )

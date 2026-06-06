@@ -1,4 +1,4 @@
-from pessoa import Pessoa
+from entidade.pessoa import Pessoa
 from datetime import date
 
 
@@ -12,6 +12,9 @@ class Paciente(Pessoa):
     @property
     def data_nascimento(self) -> date:
         return self.__data_nascimento
+    
+    def tipo_pessoa(self) -> str:
+        return "Paciente"
 
     @data_nascimento.setter
     def data_nascimento(self, data_nascimento: date) -> None:

@@ -1,5 +1,5 @@
 from datetime import date
-from pagamento import Pagamento
+from entidade.pagamento import Pagamento
 
 
 class Cartao(Pagamento):
@@ -27,4 +27,4 @@ class Cartao(Pagamento):
         self.__bandeira = bandeira
 
     def processar_pagamento(self) -> None:
-        print("Pagamento via cartão está sendo processado")
+        print(f"Pagamento no cartão {self.__bandeira} está sendo processado")

@@ -29,3 +29,6 @@ class Profissional(Pessoa):
     @registro_profissional.setter
     def registro_profissional(self, registro_profissional) -> None:
         self.__registro_profissional = registro_profissional
+    
+    def tipo_pessoa(self) -> str:
+        return "Profissional"

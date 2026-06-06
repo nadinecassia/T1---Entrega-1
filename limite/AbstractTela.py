@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class AbstractTela(ABC):
     def __init__(self, controlador):
         self._controlador = controlador
@@ -16,9 +17,9 @@ class AbstractTela(ABC):
 
                 if valores_validos and inteiro not in valores_validos:
                     raise ValueError
-                
+
                 return inteiro
-            
+
             except ValueError:
                 print("Valor incorreto: Digite um valor numérico inteiro válido.")
                 if valores_validos:

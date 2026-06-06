@@ -1,5 +1,5 @@
 from datetime import date
-from pagamento import Pagamento
+from entidade.pagamento import Pagamento
 
 
 class Dinheiro(Pagamento):
