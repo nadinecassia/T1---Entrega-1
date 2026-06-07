@@ -30,6 +30,15 @@ class ControladorProcedimento:
 
         self.__tela_procedimento.mostrar_msg("ERRO: Procedimento com a descrição informada não foi localizado.")
         return None
+    
+    def remover_procedimentos_do_atendimento(self, atendimento) -> None:
+        procedimentos_para_remover = []
+        for procedimento in self.__procedimentos:
+            if procedimento in atendimento.procedimentos:
+                procedimentos_para_remover.append(procedimento)
+                
+        for procedimento in procedimentos_para_remover:
+            self.__procedimentos.remove(procedimento)
 
     def incluir_procedimento(self):
         dados_procedimento = self.__tela_procedimento.pegar_dados()

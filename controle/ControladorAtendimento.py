@@ -220,7 +220,10 @@ class ControladorAtendimento:
         if atendimento_encontrado is not None:
             self.__controlador_principal.controlador_pagamento.remover_pagamento_do_atendimento(atendimento_encontrado)
             
+            self.__controlador_principal.controlador_procedimento.remover_procedimentos_do_atendimento(atendimento_encontrado)
+            
             self.__atendimentos.remove(atendimento_encontrado)
+            
             self.__tela_atendimento.mostrar_msg(
                 "Atendimento cancelado com sucesso!"
             )
