@@ -12,7 +12,7 @@ class ControladorProfissional:
         self.abrir_tela()
 
     def pegar_profissional_por_cpf(self, cpf: str):
-        for profissional in self.__profissional:
+        for profissional in self.__profissionais:
             if profissional.cpf == cpf:
                 return profissional
         return None
@@ -39,8 +39,8 @@ class ControladorProfissional:
             dados_profissional["nome"],
             dados_profissional["cpf"],
             dados_profissional["celular"],
-            dados_profissional["registro_profissional"],
-            dados_profissional["especialidade"]
+            dados_profissional["especialidade"],
+            dados_profissional["registro_profissional"], 
         )
 
         self.__profissionais.append(novo_profissional)
@@ -72,8 +72,8 @@ class ControladorProfissional:
         profissional.nome = novos_dados["nome"]
         profissional.cpf = novos_dados["cpf"]
         profissional.celular = novos_dados["celular"]
-        profissional.registro_profissional = novos_dados["registro_profissional"]
         profissional.especialidade = novos_dados["especialidade"]
+        profissional.registro_profissional = novos_dados["registro_profissional"]
 
         self.__tela_profissional.mostrar_msg("Profissional alterado com sucesso.")
 
@@ -104,8 +104,8 @@ class ControladorProfissional:
                 "nome": profissional.nome,
                 "cpf": profissional.cpf,
                 "celular": profissional.celular,
+                "especialidade": profissional.especialidade,
                 "registro_profissional": profissional.registro_profissional,
-                "especialidade": profissional.especialidade
             }
 
             self.__tela_profissional.mostrar_profissional(dados_profissional)
