@@ -131,4 +131,4 @@ class ControladorPaciente:
             funcao_escolhida()
 
     def voltar(self) -> None:
-        self.__controlador_principal.abre_tela()
+        return

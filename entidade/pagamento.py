@@ -1,15 +1,14 @@
 from abc import abstractmethod, ABC
 from datetime import date
-from entidade.atendimento import Atendimento
-#se der erro de tipagem:
-#from typing import TYPE_CHECKING
-#if TYPE_CHECKING:
-#    from entidade.atendimento import Atendimento
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from entidade.atendimento import Atendimento
 #Onde tiver Atendimento colocar "Atendimento"
 
 
 class Pagamento(ABC):
-    def __init__(self, data: date, valor_pago: float, atendimento: Atendimento) -> None:
+    def __init__(self, data: date, valor_pago: float, atendimento: "Atendimento") -> None:
         self.__data = data
         self.__valor_pago = valor_pago
         self.__atendimento = atendimento
@@ -23,7 +22,7 @@ class Pagamento(ABC):
         return self.__valor_pago
     
     @property
-    def atendimento(self) -> Atendimento:
+    def atendimento(self) -> "Atendimento":
         return self.__atendimento
     
     @property
