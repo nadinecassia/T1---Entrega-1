@@ -6,7 +6,6 @@ from entidade.procedimento import Procedimento
 from entidade.pagamento import Pagamento
 from entidade.TipoAtendimento import TipoAtendimento
 
-
 class Atendimento:
     def __init__(
         self,
@@ -111,12 +110,12 @@ class Atendimento:
         return self.__pagamentos
 
     def calcular_valor_restante(self) -> float:
-        valor_restante = self.__valor
+        divida_total = self.__valor + self.calcular_custo_total_procedimentos()
 
         for pagamento in self.__pagamentos:
-            valor_restante -= pagamento.valor_pago
+            divida_total -= pagamento.valor_pago
 
-        return valor_restante
+        return divida_total
 
     def calcular_custo_total_procedimentos(self) -> float:
         total_procedimentos = 0

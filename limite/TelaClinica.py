@@ -25,7 +25,6 @@ class TelaClinica(AbstractTela):
         horario_aberto= self.le_horario("Horário de abertura (HH:MM): ")
         horario_fechado= self.le_horario("Horário de fechamento (HH:MM): ")
 
-
         return {
             "nome": nome,
             "descricao": descricao,
