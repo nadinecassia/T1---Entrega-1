@@ -10,6 +10,11 @@ class ControladorClinica:
     def iniciar(self):
         self.abrir_tela()
     
+    def pegar_clinica_por_nome(self, nome: str):
+        for clinica in self.__clinicas:
+            if clinica.nome.lower() == nome.lower():
+                return clinica
+    
     def incluir_clinica(self):
         dados_clinica = self.__tela_clinica.pegar_dados()
 
@@ -22,6 +27,8 @@ class ControladorClinica:
             dados_clinica["nome"],
             dados_clinica["descricao"],
             dados_clinica["cidade"]
+            dados_clinica["horario_aberto"]
+            dados_clinica["horario_fechado"]
         )
 
         self.__clinicas.append(nova_clinica)
@@ -37,6 +44,8 @@ class ControladorClinica:
                 clinica.nome = dados_clinica["nome"]
                 clinica.descricao = dados_clinica["descricao"]
                 clinica.cidade = dados_clinica["cidade"]
+                clinica.horario_aberto = dados_clinica["horario_aberto"]
+                clinica.horario_fechado = dados_clinica["horario_fechado"]
 
                 self.__tela_clinica.mostrar_msg("Clínica alterada com sucesso!")
                 return
@@ -63,7 +72,9 @@ class ControladorClinica:
             dados = {
                 "nome": clinica.nome,
                 "descricao": clinica.descricao,
-                "cidade": clinica.cidade
+                "cidade": clinica.cidade,
+                "horario_aberto": clinica.horario_aberto,
+                "horario_fechado": clinica.horario_fechado
             }
             self.__tela_clinica.mostrar_clinica(dados)
     

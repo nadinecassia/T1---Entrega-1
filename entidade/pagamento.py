@@ -1,6 +1,11 @@
 from abc import abstractmethod, ABC
 from datetime import date
 from entidade.atendimento import Atendimento
+#se der erro de tipagem:
+#from typing import TYPE_CHECKING
+#if TYPE_CHECKING:
+#    from entidade.atendimento import Atendimento
+#Onde tiver Atendimento colocar "Atendimento"
 
 
 class Pagamento(ABC):
