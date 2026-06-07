@@ -12,7 +12,7 @@ class ControladorPagamento:
 
     def iniciar(self) -> None:
         self.abrir_tela()
-    
+
     def pegar_atendimentos(self) -> list:
         return self.__controlador_principal.controlador_atendimento.atendimentos
 
@@ -36,7 +36,7 @@ class ControladorPagamento:
             }
 
             self.__tela_pagamento.mostrar_atendimento_resumo(dados_atendimento)
-        
+
     def selecionar_atendimento(self):
         atendimentos = self.pegar_atendimentos()
 
@@ -53,7 +53,7 @@ class ControladorPagamento:
             return None
 
         return atendimentos[indice]
-    
+
     def criar_pagamento_para_atendimento(self, atendimento):
         dados_pagamento = self.__tela_pagamento.pegar_dados()
 
@@ -68,7 +68,7 @@ class ControladorPagamento:
                 "ERRO: O valor pago não pode ser maior que o valor restante."
             )
             return None
-        
+
         modalidade = self.__tela_pagamento.mostrar_menu_modalidade()
 
         if modalidade == 1:
@@ -101,6 +101,16 @@ class ControladorPagamento:
 
         return pagamento
 
+    def remover_pagamento_do_atendimento(self, atendimento) -> None:
+        pagamentos_para_remover = []
+
+        for pagamento in self.__pagamentos:
+            if pagamento.atendimento == atendimento:
+                pagamentos_para_remover.append(pagamento)
+
+        for pagamento in pagamentos_para_remover:
+            self.__pagamentos.remove(pagamento)
+
     def incluir_pagamento(self) -> None:
         atendimento = self.selecionar_atendimento()
 
@@ -118,7 +128,7 @@ class ControladorPagamento:
         self.__pagamentos.append(pagamento)
 
         self.__tela_pagamento.mostrar_msg("Pagamento cadastrado com sucesso.")
-    
+
     def listar_pagamentos(self) -> None:
         if len(self.__pagamentos) == 0:
             self.__tela_pagamento.mostrar_msg("Nenhum pagamento cadastrado.")
@@ -131,10 +141,10 @@ class ControladorPagamento:
                 "data": pagamento.data,
                 "valor_pago": pagamento.valor_pago,
                 "paciente": pagamento.paciente.nome,
-        }
+            }
 
         self.__tela_pagamento.mostrar_pagamento(dados_pagamento)
-    
+
     def pegar_pagamento_por_indice(self, indice: int):
         if indice < 0 or indice >= len(self.__pagamentos):
             return None
@@ -152,7 +162,7 @@ class ControladorPagamento:
             return "Cartão de crédito"
 
         return "Pagamento"
-    
+
     def alterar_pagamento(self) -> None:
         if len(self.__pagamentos) == 0:
             self.__tela_pagamento.mostrar_msg("Nenhum pagamento cadastrado.")
@@ -199,7 +209,6 @@ class ControladorPagamento:
 
         self.__tela_pagamento.mostrar_msg("Pagamento alterado com sucesso.")
 
-
     def excluir_pagamento(self) -> None:
         if len(self.__pagamentos) == 0:
             self.__tela_pagamento.mostrar_msg("Nenhum pagamento cadastrado.")
@@ -220,7 +229,7 @@ class ControladorPagamento:
             pagamento.atendimento.pagamentos.remove(pagamento)
 
         self.__tela_pagamento.mostrar_msg("Pagamento removido com sucesso.")
-    
+
     def abrir_tela(self) -> None:
         lista_opcoes = {
             1: self.incluir_pagamento,
@@ -243,4 +252,4 @@ class ControladorPagamento:
             funcao_escolhida()
 
     def voltar(self) -> None:
-       return
+        return

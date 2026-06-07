@@ -21,9 +21,9 @@ class ControladorAtendimento:
             "Digite o nome exato da clínica: "
         )
         clinica = (
-            self.__controlador_principal
-            .controlador_clinica
-            .pegar_clinica_por_nome(nome_clinica)
+            self.__controlador_principal.controlador_clinica.pegar_clinica_por_nome(
+                nome_clinica
+            )
         )
         if not clinica:
             self.__tela_atendimento.mostrar_msg(
@@ -32,9 +32,7 @@ class ControladorAtendimento:
             return
 
         paciente = (
-            self.__controlador_principal
-            .controlador_paciente
-            .selecionar_paciente_para_atendimento()
+            self.__controlador_principal.controlador_paciente.selecionar_paciente_para_atendimento()
         )
         if not paciente:
             self.__tela_atendimento.mostrar_msg(
@@ -43,9 +41,7 @@ class ControladorAtendimento:
             return
 
         profissional = (
-            self.__controlador_principal
-            .controlador_profissional
-            .selecionar_profissional_para_atendimento()
+            self.__controlador_principal.controlador_profissional.selecionar_profissional_para_atendimento()
         )
         if not profissional:
             self.__tela_atendimento.mostrar_msg(
@@ -56,10 +52,8 @@ class ControladorAtendimento:
         nome_tipo = self.__tela_atendimento.le_texto_obrigatorio(
             "Digite o nome do Tipo de Atendimento: "
         )
-        tipo_atendimento = (
-            self.__controlador_principal
-            .controlador_tipo_atendimento
-            .pegar_tipo_por_nome(nome_tipo)
+        tipo_atendimento = self.__controlador_principal.controlador_tipo_atendimento.pegar_tipo_por_nome(
+            nome_tipo
         )
         if not tipo_atendimento:
             self.__tela_atendimento.mostrar_msg(
@@ -77,8 +71,9 @@ class ControladorAtendimento:
             )
             return
 
-        if not clinica.esta_aberta(dados_tela["horario_inicio"],
-                                   dados_tela["horario_fim"]):
+        if not clinica.esta_aberta(
+            dados_tela["horario_inicio"], dados_tela["horario_fim"]
+        ):
             self.__tela_atendimento.mostrar_msg(
                 f"REJEITADO: Horário fora do funcionamento desta clínica "
                 f"({clinica.horario_aberto.strftime('%H:%M')} às "
@@ -94,7 +89,7 @@ class ControladorAtendimento:
             valor=dados_tela["valor"],
             clinica=clinica,
             paciente=paciente,
-            profissional=profissional
+            profissional=profissional,
         )
 
         self.__atendimentos.append(novo_atendimento)
@@ -102,20 +97,25 @@ class ControladorAtendimento:
 
     def alterar_atendimento(self):
         if len(self.__atendimentos) == 0:
-            self.__tela_atendimento.mostrar_msg("Nenhum atendimento agendado para alterar!")
+            self.__tela_atendimento.mostrar_msg(
+                "Nenhum atendimento agendado para alterar!"
+            )
             return
 
         dados_busca = self.__tela_atendimento.selecionar()
         atendimento_encontrado = self.__busca_atendimento(
-            dados_busca["cpf_paciente"], 
-            dados_busca["data"]
+            dados_busca["cpf_paciente"], dados_busca["data"]
         )
 
-        self.__tela_atendimento.mostrar_msg(f"\n--- Digitandos novos dados para o atendimento de {atendimento_encontrado.paciente.nome} ---")
+        self.__tela_atendimento.mostrar_msg(
+            f"\n--- Digitandos novos dados para o atendimento de {atendimento_encontrado.paciente.nome} ---"
+        )
         novos_dados = self.__tela_atendimento.pegar_dados()
 
         clinica = atendimento_encontrado.clinica
-        if not clinica.esta_aberta(novos_dados["horario_inicio"], novos_dados["horario_fim"]):
+        if not clinica.esta_aberta(
+            novos_dados["horario_inicio"], novos_dados["horario_fim"]
+        ):
             self.__tela_atendimento.mostrar_msg(
                 f"REJEITADO: Novo horário fora do funcionamento da clínica "
                 f"({clinica.horario_aberto.strftime('%H:%M')} às {clinica.horario_fechado.strftime('%H:%M')})!"
@@ -127,12 +127,16 @@ class ControladorAtendimento:
         atendimento_encontrado.horario_fim = novos_dados["horario_fim"]
         atendimento_encontrado.valor = novos_dados["valor"]
 
-        self.__tela_atendimento.mostrar_msg("Dados do atendimento alterados com sucesso!")
+        self.__tela_atendimento.mostrar_msg(
+            "Dados do atendimento alterados com sucesso!"
+        )
 
     def __busca_atendimento(self, cpf_paciente: str, data_proc: date):
         for atendimento in self.__atendimentos:
-            if (atendimento.paciente.cpf == cpf_paciente and
-                    atendimento.data == data_proc):
+            if (
+                atendimento.paciente.cpf == cpf_paciente
+                and atendimento.data == data_proc
+            ):
                 return atendimento
         return None
 
@@ -145,20 +149,15 @@ class ControladorAtendimento:
 
         dados_busca = self.__tela_atendimento.selecionar()
         atendimento_encontrado = self.__busca_atendimento(
-            dados_busca["cpf_paciente"], 
-            dados_busca["data"]
+            dados_busca["cpf_paciente"], dados_busca["data"]
         )
 
         if atendimento_encontrado is None:
-            self.__tela_atendimento.mostrar_msg(
-                "ERRO: Atendimento não localizado!"
-            )
+            self.__tela_atendimento.mostrar_msg("ERRO: Atendimento não localizado!")
             return
 
         procedimento = (
-            self.__controlador_principal
-            .controlador_procedimento
-            .selecionar_procedimento_para_atendimento()
+            self.__controlador_principal.controlador_procedimento.selecionar_procedimento_para_atendimento()
         )
         if procedimento is None:
             self.__tela_atendimento.mostrar_msg(
@@ -180,14 +179,11 @@ class ControladorAtendimento:
 
         dados_busca = self.__tela_atendimento.selecionar()
         atendimento_encontrado = self.__busca_atendimento(
-            dados_busca["cpf_paciente"], 
-            dados_busca["data"]
+            dados_busca["cpf_paciente"], dados_busca["data"]
         )
-        
+
         if atendimento_encontrado is None:
-            self.__tela_atendimento.mostrar_msg(
-                "ERRO: Atendimento não localizado!"
-            )
+            self.__tela_atendimento.mostrar_msg("ERRO: Atendimento não localizado!")
             return
 
         valor_restante = atendimento_encontrado.calcular_valor_restante()
@@ -198,16 +194,12 @@ class ControladorAtendimento:
             )
             return
 
-        self.__tela_atendimento.mostrar_msg(f"Valor total restante: R$ {valor_restante:.2f}")
+        self.__tela_atendimento.mostrar_msg(
+            f"Valor total restante: R$ {valor_restante:.2f}"
+        )
 
-        pagamento = (
-            self.__controlador_principal
-            .controlador_pagamento
-            .criar_pagamento_para_atendimento(
-                atendimento_encontrado.paciente,
-                valor_restante,
-                atendimento_encontrado.data
-            )
+        pagamento = self.__controlador_principal.controlador_pagamento.criar_pagamento_para_atendimento(
+            atendimento_encontrado.paciente, valor_restante, atendimento_encontrado.data
         )
 
         if pagamento is None:
@@ -248,7 +240,7 @@ class ControladorAtendimento:
                 "procedimentos": [
                     {"descricao": p.descricao, "custo": p.custo}
                     for p in atendimento.procedimentos
-                ]
+                ],
             }
             self.__tela_atendimento.mostrar_atendimento(dados)
 
@@ -261,19 +253,17 @@ class ControladorAtendimento:
 
         dados_busca = self.__tela_atendimento.selecionar()
         atendimento_encontrado = self.__busca_atendimento(
-            dados_busca["cpf_paciente"], 
-            dados_busca["data"]
+            dados_busca["cpf_paciente"], dados_busca["data"]
         )
 
         if atendimento_encontrado is not None:
+            self.__controlador_principal.controlador_pagamento.remover_pagamento_do_atendimento(
+                atendimento_encontrado
+            )
             self.__atendimentos.remove(atendimento_encontrado)
-            self.__tela_atendimento.mostrar_msg(
-                "Atendimento cancelado com sucesso!"
-            )
+            self.__tela_atendimento.mostrar_msg("Atendimento cancelado com sucesso!")
         else:
-            self.__tela_atendimento.mostrar_msg(
-                "ERRO: Atendimento não localizado."
-            )
+            self.__tela_atendimento.mostrar_msg("ERRO: Atendimento não localizado.")
 
     def abrir_tela(self):
         lista_opcoes = {
@@ -283,7 +273,7 @@ class ControladorAtendimento:
             4: self.listar_atendimentos,
             5: self.registrar_procedimento_em_atendimento,
             6: self.registrar_pagamento_de_atendimento,
-            0: self.voltar
+            0: self.voltar,
         }
 
         while True:
