@@ -61,9 +61,9 @@ class TelaAtendimento(AbstractTela):
         print("\n-------- SELECIONAR ATENDIMENTO --------")
         print("Para localizar o atendimento, informe os dados chave:")
         cpf_paciente = self.le_texto_obrigatorio("CPF do Paciente: ")
-        data_str = self.le_texto_obrigatorio("Data do atendimento (DD/MM/AAAA): ")
+        data_valida = self.le_data("Data do atendimento (DD/MM/AAAA): ")
         
-        return {"cpf_paciente": cpf_paciente, "data_str": data_str}
+        return {"cpf_paciente": cpf_paciente, "data": data_valida}
 
     def mostrar_msg(self, msg: str):
         print(msg)

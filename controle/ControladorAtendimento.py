@@ -106,16 +106,10 @@ class ControladorAtendimento:
             return
 
         dados_busca = self.__tela_atendimento.selecionar()
-        try:
-            data_valida = datetime.strptime(dados_busca["data_str"], "%d/%m/%Y").date()
-        except ValueError:
-            self.__tela_atendimento.mostrar_msg("ERRO: Formato de data inválido!")
-            return
-
-        atendimento_encontrado = self.__busca_atendimento(dados_busca["cpf_paciente"], data_valida)
-        if atendimento_encontrado is None:
-            self.__tela_atendimento.mostrar_msg("ERRO: Atendimento não localizado!")
-            return
+        atendimento_encontrado = self.__busca_atendimento(
+            dados_busca["cpf_paciente"], 
+            dados_busca["data"]
+        )
 
         self.__tela_atendimento.mostrar_msg(f"\n--- Digitandos novos dados para o atendimento de {atendimento_encontrado.paciente.nome} ---")
         novos_dados = self.__tela_atendimento.pegar_dados()
@@ -150,19 +144,11 @@ class ControladorAtendimento:
             return
 
         dados_busca = self.__tela_atendimento.selecionar()
-        try:
-            data_valida = datetime.strptime(
-                dados_busca["data_str"], "%d/%m/%Y"
-            ).date()
-        except ValueError:
-            self.__tela_atendimento.mostrar_msg(
-                "ERRO: Formato de data inválido!"
-            )
-            return
-
         atendimento_encontrado = self.__busca_atendimento(
-            dados_busca["cpf_paciente"], data_valida
+            dados_busca["cpf_paciente"], 
+            dados_busca["data"]
         )
+
         if atendimento_encontrado is None:
             self.__tela_atendimento.mostrar_msg(
                 "ERRO: Atendimento não localizado!"
@@ -193,19 +179,11 @@ class ControladorAtendimento:
             return
 
         dados_busca = self.__tela_atendimento.selecionar()
-        try:
-            data_valida = datetime.strptime(
-                dados_busca["data_str"], "%d/%m/%Y"
-            ).date()
-        except ValueError:
-            self.__tela_atendimento.mostrar_msg(
-                "ERRO: Formato de data inválido!"
-            )
-            return
-
         atendimento_encontrado = self.__busca_atendimento(
-            dados_busca["cpf_paciente"], data_valida
+            dados_busca["cpf_paciente"], 
+            dados_busca["data"]
         )
+        
         if atendimento_encontrado is None:
             self.__tela_atendimento.mostrar_msg(
                 "ERRO: Atendimento não localizado!"
@@ -220,7 +198,7 @@ class ControladorAtendimento:
             )
             return
 
-        print(f"Valor total restante: R$ {valor_restante:.2f}")
+        self.__tela_atendimento.mostrar_msg(f"Valor total restante: R$ {valor_restante:.2f}")
 
         pagamento = (
             self.__controlador_principal
@@ -282,18 +260,9 @@ class ControladorAtendimento:
             return
 
         dados_busca = self.__tela_atendimento.selecionar()
-        try:
-            data_valida = datetime.strptime(
-                dados_busca["data_str"], "%d/%m/%Y"
-            ).date()
-        except ValueError:
-            self.__tela_atendimento.mostrar_msg(
-                "ERRO: Formato de data inválido!"
-            )
-            return
-
         atendimento_encontrado = self.__busca_atendimento(
-            dados_busca["cpf_paciente"], data_valida
+            dados_busca["cpf_paciente"], 
+            dados_busca["data"]
         )
 
         if atendimento_encontrado is not None:

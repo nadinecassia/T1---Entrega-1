@@ -35,7 +35,7 @@ class ControladorPagamento:
                 "valor_restante": atendimento.calcular_valor_restante(),
             }
 
-            self.__tela_pagamento.mostrar_atendimento_resumido(dados_atendimento)
+            self.__tela_pagamento.mostrar_atendimento_resumo(dados_atendimento)
         
     def selecionar_atendimento(self):
         atendimentos = self.pegar_atendimentos()

@@ -21,7 +21,7 @@ class ControladorPaciente:
         if len(self.__pacientes) == 0:
             self.__tela_paciente.mostrar_msg("Nenhum paciente cadastrado.")
             return None
-        self.listar_pacientes
+        self.listar_pacientes()
 
         cpf = self.__tela_paciente.selecionar()
         return self.pegar_paciente_por_cpf(cpf)
