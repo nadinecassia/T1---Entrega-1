@@ -7,7 +7,7 @@ class ControladorProfissional:
         self.__tela_profissional = TelaProfissional(self)
         self.__profissionais = []
         self.__controlador_principal = controlador_principal
-    
+
     def iniciar(self):
         self.abrir_tela()
 
@@ -16,20 +16,30 @@ class ControladorProfissional:
             if profissional.cpf == cpf:
                 return profissional
         return None
-    
+
     def selecionar_profissional_para_atendimento(self):
         if len(self.__profissionais) == 0:
             self.__tela_profissional.mostrar_msg("Nenhum profissional cadastrado.")
             return None
-        self.listar_profissionais
+        self.listar_profissionais()
 
         cpf = self.__tela_profissional.selecionar()
-        return self.pegar_profissional_por_cpf(cpf)
+        profissional = self.pegar_profissional_por_cpf(cpf)
+
+        if profissional is None:
+            self.__tela_profissional.mostrar_msg("Profissional não encontrado.")
+            return None
+        return profissional
     
+    def selecionar_profissional_para_procedimentos(self):
+        return self.selecionar_profissional_para_atendimento
+
     def incluir_profissional(self):
         dados_profissional = self.__tela_profissional.pegar_dados()
 
-        profissional_existente = self.pegar_profissional_por_cpf(dados_profissional["cpf"])
+        profissional_existente = self.pegar_profissional_por_cpf(
+            dados_profissional["cpf"]
+        )
 
         if profissional_existente is not None:
             self.__tela_profissional.mostrar_msg("Profissional já cadastrado.")
@@ -40,12 +50,12 @@ class ControladorProfissional:
             dados_profissional["cpf"],
             dados_profissional["celular"],
             dados_profissional["especialidade"],
-            dados_profissional["registro_profissional"], 
+            dados_profissional["registro_profissional"],
         )
 
         self.__profissionais.append(novo_profissional)
         self.__tela_profissional.mostrar_msg("Profissional cadastrado com sucesso!")
-    
+
     def alterar_profissional(self) -> None:
         if len(self.__profissionais) == 0:
             self.__tela_profissional.mostrar_msg("Nenhum profissional cadastrado.")
@@ -66,7 +76,9 @@ class ControladorProfissional:
         profissional_novo_cpf = self.pegar_profissional_por_cpf(novos_dados["cpf"])
 
         if profissional_novo_cpf is not None and profissional_novo_cpf != profissional:
-            self.__tela_profissional.mostrar_msg("Já existe outro profissional com esse CPF.")
+            self.__tela_profissional.mostrar_msg(
+                "Já existe outro profissional com esse CPF."
+            )
             return
 
         profissional.nome = novos_dados["nome"]
@@ -133,4 +145,3 @@ class ControladorProfissional:
 
     def voltar(self) -> None:
         return
-
