@@ -31,8 +31,8 @@ class ControladorProfissional:
             return None
         return profissional
     
-    def selecionar_profissional_para_procedimentos(self):
-        return self.selecionar_profissional_para_atendimento
+    def selecionar_profissional_para_procedimento(self):
+        return self.selecionar_profissional_para_atendimento()
 
     def incluir_profissional(self):
         dados_profissional = self.__tela_profissional.pegar_dados()
