@@ -170,47 +170,6 @@ class ControladorAtendimento:
             f"Procedimento '{procedimento.descricao}' adicionado!"
         )
 
-    def registrar_pagamento_de_atendimento(self):
-        if len(self.__atendimentos) == 0:
-            self.__tela_atendimento.mostrar_msg(
-                "Nenhum atendimento agendado para registrar pagamentos!"
-            )
-            return
-
-        dados_busca = self.__tela_atendimento.selecionar()
-        atendimento_encontrado = self.__busca_atendimento(
-            dados_busca["cpf_paciente"], dados_busca["data"]
-        )
-
-        if atendimento_encontrado is None:
-            self.__tela_atendimento.mostrar_msg("ERRO: Atendimento não localizado!")
-            return
-
-        valor_restante = atendimento_encontrado.calcular_valor_restante()
-
-        if valor_restante <= 0:
-            self.__tela_atendimento.mostrar_msg(
-                "Este atendimento já está totalmente quitado!"
-            )
-            return
-
-        self.__tela_atendimento.mostrar_msg(
-            f"Valor total restante: R$ {valor_restante:.2f}"
-        )
-
-        pagamento = self.__controlador_principal.controlador_pagamento.criar_pagamento_para_atendimento(
-            atendimento_encontrado.paciente, valor_restante, atendimento_encontrado.data
-        )
-
-        if pagamento is None:
-            self.__tela_atendimento.mostrar_msg(
-                "ERRO: Registro de pagamento cancelado!"
-            )
-            return
-
-        atendimento_encontrado.add_pagamentos(pagamento)
-        self.__tela_atendimento.mostrar_msg("Pagamento registrado!")
-
     def listar_atendimentos(self):
         if len(self.__atendimentos) == 0:
             self.__tela_atendimento.mostrar_msg(
@@ -252,18 +211,23 @@ class ControladorAtendimento:
             return
 
         dados_busca = self.__tela_atendimento.selecionar()
+
         atendimento_encontrado = self.__busca_atendimento(
-            dados_busca["cpf_paciente"], dados_busca["data"]
+            dados_busca["cpf_paciente"], 
+            dados_busca["data"]
         )
 
         if atendimento_encontrado is not None:
-            self.__controlador_principal.controlador_pagamento.remover_pagamento_do_atendimento(
-                atendimento_encontrado
-            )
+            self.__controlador_principal.controlador_pagamento.remover_pagamento_do_atendimento(atendimento_encontrado)
+            
             self.__atendimentos.remove(atendimento_encontrado)
-            self.__tela_atendimento.mostrar_msg("Atendimento cancelado com sucesso!")
+            self.__tela_atendimento.mostrar_msg(
+                "Atendimento cancelado com sucesso!"
+            )
         else:
-            self.__tela_atendimento.mostrar_msg("ERRO: Atendimento não localizado.")
+            self.__tela_atendimento.mostrar_msg(
+                "ERRO: Atendimento não localizado."
+            )
 
     def abrir_tela(self):
         lista_opcoes = {
@@ -272,7 +236,6 @@ class ControladorAtendimento:
             3: self.excluir_atendimento,
             4: self.listar_atendimentos,
             5: self.registrar_procedimento_em_atendimento,
-            6: self.registrar_pagamento_de_atendimento,
             0: self.voltar,
         }
 

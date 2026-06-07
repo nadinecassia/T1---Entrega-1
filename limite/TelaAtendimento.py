@@ -11,7 +11,6 @@ class TelaAtendimento(AbstractTela):
         print("3 - Excluir Atendimento")
         print("4 - Listar Atendimentos Agendados")
         print("5 - Registrar Procedimento em um Atendimento")
-        print("6 - Registrar Pagamento de Atendimento")
         print("0 - Voltar")
         
         opcao = self.le_num_inteiro("Escolha a opção: ", [1, 2, 3, 4, 5, 6, 0])
