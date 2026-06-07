@@ -15,6 +15,22 @@ class ControladorProcedimento:
     def iniciar(self):
         self.abrir_tela()
 
+    def selecionar_procedimento_para_atendimento(self):
+        if len(self.__procedimentos) == 0:
+            self.__tela_procedimento.mostrar_msg("Nenhum procedimento cadastrado no sistema!")
+            return None
+
+        self.listar_procedimentos()
+
+        descricao_busca = self.__tela_procedimento.selecionar()
+
+        for proc in self.__procedimentos:
+            if proc.descricao.lower() == descricao_busca.lower():
+                return proc
+
+        self.__tela_procedimento.mostrar_msg("ERRO: Procedimento com a descrição informada não foi localizado.")
+        return None
+
     def incluir_procedimento(self):
         dados_proc = self.__tela_procedimento.pegar_dados()
 

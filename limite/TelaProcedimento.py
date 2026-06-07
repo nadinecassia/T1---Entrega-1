@@ -30,7 +30,7 @@ class TelaProcedimento(AbstractTela):
 
     def selecionar(self) -> str:
         print("\n-------- SELECIONAR PROCEDIMENTO --------")
-        descricao = self.le_texto_obrigatorio("Digite la descrição exata do procedimento: ")
+        descricao = self.le_texto_obrigatorio("Digite a descrição exata do procedimento: ")
         return descricao
 
     def mostrar_msg(self, msg: str):
