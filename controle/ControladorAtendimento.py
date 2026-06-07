@@ -69,17 +69,9 @@ class ControladorAtendimento:
 
         dados_tela = self.__tela_atendimento.pegar_dados()
 
-        data_atendimento = dados_tela["data"]
-        data_nasc = paciente.data_nascimento
-
-        idade = data_atendimento.year - data_nasc.year
-        if ((data_atendimento.month, data_atendimento.day) <
-                (data_nasc.month, data_nasc.day)):
-            idade -= 1
-
-        if idade < 18:
+        if paciente.calcular_idade() < 18:
             self.__tela_atendimento.mostrar_msg(
-                f"O paciente {paciente.nome} tem {idade} anos. "
+                f"O paciente {paciente.nome} tem {paciente.calcular_idade()} anos. "
                 "Somente maiores de 18 anos podem realizar atendimentos "
                 "de forma independente!"
             )
