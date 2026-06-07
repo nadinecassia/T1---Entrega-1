@@ -64,3 +64,6 @@ class AbstractTela(ABC):
             if texto !="":
                 return texto
             print("Esse campo não pode ficar vazio.")
+    
+    def mostrar_msg(self, mensagem: str) -> None:
+        print(mensagem)
