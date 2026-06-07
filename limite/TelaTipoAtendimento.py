@@ -32,3 +32,6 @@ class TelaTipoAtendimento(AbstractTela):
         print("\n-------- SELECIONAR TIPO DE ATENDIMENTO --------")
         nome = self.le_texto_obrigatorio("Digite o nome do tipo de atendimento: ")
         return nome
+    
+    def mostrar_msg(self, msg: str):
+        print(msg)
