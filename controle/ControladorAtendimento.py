@@ -101,10 +101,39 @@ class ControladorAtendimento:
         self.__tela_atendimento.mostrar_msg("Atendimento agendado com sucesso!")
 
     def alterar_atendimento(self):
-        # Esqueleto inserido para satisfazer a opção 2 do menu da View
-        self.__tela_atendimento.mostrar_msg(
-            "Funcionalidade de alteração em desenvolvimento."
-        )
+        if len(self.__atendimentos) == 0:
+            self.__tela_atendimento.mostrar_msg("Nenhum atendimento agendado para alterar!")
+            return
+
+        dados_busca = self.__tela_atendimento.selecionar()
+        try:
+            data_valida = datetime.strptime(dados_busca["data_str"], "%d/%m/%Y").date()
+        except ValueError:
+            self.__tela_atendimento.mostrar_msg("ERRO: Formato de data inválido!")
+            return
+
+        atendimento_encontrado = self.__busca_atendimento(dados_busca["cpf_paciente"], data_valida)
+        if atendimento_encontrado is None:
+            self.__tela_atendimento.mostrar_msg("ERRO: Atendimento não localizado!")
+            return
+
+        self.__tela_atendimento.mostrar_msg(f"\n--- Digitandos novos dados para o atendimento de {atendimento_encontrado.paciente.nome} ---")
+        novos_dados = self.__tela_atendimento.pegar_dados()
+
+        clinica = atendimento_encontrado.clinica
+        if not clinica.esta_aberta(novos_dados["horario_inicio"], novos_dados["horario_fim"]):
+            self.__tela_atendimento.mostrar_msg(
+                f"REJEITADO: Novo horário fora do funcionamento da clínica "
+                f"({clinica.horario_aberto.strftime('%H:%M')} às {clinica.horario_fechado.strftime('%H:%M')})!"
+            )
+            return
+
+        atendimento_encontrado.data = novos_dados["data"]
+        atendimento_encontrado.horario_inicio = novos_dados["horario_inicio"]
+        atendimento_encontrado.horario_fim = novos_dados["horario_fim"]
+        atendimento_encontrado.valor = novos_dados["valor"]
+
+        self.__tela_atendimento.mostrar_msg("Dados do atendimento alterados com sucesso!")
 
     def __busca_atendimento(self, cpf_paciente: str, data_proc: date):
         for atendimento in self.__atendimentos:
