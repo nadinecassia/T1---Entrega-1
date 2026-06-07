@@ -24,18 +24,18 @@ class ControladorProcedimento:
 
         descricao_busca = self.__tela_procedimento.selecionar()
 
-        for proc in self.__procedimentos:
-            if proc.descricao.lower() == descricao_busca.lower():
-                return proc
+        for procedimento in self.__procedimentos:
+            if procedimento.descricao.lower() == descricao_busca.lower():
+                return procedimento
 
         self.__tela_procedimento.mostrar_msg("ERRO: Procedimento com a descrição informada não foi localizado.")
         return None
 
     def incluir_procedimento(self):
-        dados_proc = self.__tela_procedimento.pegar_dados()
+        dados_procedimento = self.__tela_procedimento.pegar_dados()
 
-        for proc in self.__procedimentos:
-            if proc.descricao.lower() == dados_proc["descricao"].lower():
+        for procedimento in self.__procedimentos:
+            if procedimento.descricao.lower() == dados_procedimento["descricao"].lower():
                 self.__tela_procedimento.mostrar_msg(
                     "Já existe um procedimento com essa descrição!"
                 )
@@ -54,8 +54,8 @@ class ControladorProcedimento:
             return
 
         novo_procedimento = Procedimento(
-            dados_proc["descricao"],
-            dados_proc["custo"],
+            dados_procedimento["descricao"],
+            dados_procedimento["custo"],
             profissional
         )
 
@@ -67,22 +67,22 @@ class ControladorProcedimento:
     def alterar_procedimento(self):
         nome_busca = self.__tela_procedimento.selecionar()
 
-        for proc in self.__procedimentos:
-            if proc.descricao.lower() == nome_busca.lower():
-                dados_proc = self.__tela_procedimento.pegar_dados()
+        for procedimento in self.__procedimentos:
+            if procedimento.descricao.lower() == nome_busca.lower():
+                dados_procedimento = self.__tela_procedimento.pegar_dados()
 
-                if dados_proc["descricao"].lower() != proc.descricao.lower():
+                if dados_procedimento["descricao"].lower() != procedimento.descricao.lower():
                     for outro_proc in self.__procedimentos:
                         if (outro_proc.descricao.lower() ==
-                                dados_proc["descricao"].lower()):
+                                dados_procedimento["descricao"].lower()):
                             self.__tela_procedimento.mostrar_msg(
                                 "ERRO: Já existe outro procedimento "
                                 "com essa nova descrição!"
                             )
                             return
 
-                proc.descricao = dados_proc["descricao"]
-                proc.custo = dados_proc["custo"]
+                procedimento.descricao = dados_procedimento["descricao"]
+                procedimento.custo = dados_procedimento["custo"]
 
                 novo_prof = (
                     self.__controlador_principal
@@ -90,7 +90,7 @@ class ControladorProcedimento:
                     .selecionar_profissional_para_procedimento()
                 )
                 if novo_prof is not None:
-                    proc.profissional = novo_prof
+                    procedimento.profissional = novo_prof
 
                 self.__tela_procedimento.mostrar_msg(
                     "Procedimento alterado com sucesso!"
@@ -104,9 +104,9 @@ class ControladorProcedimento:
     def excluir_procedimento(self):
         nome_busca = self.__tela_procedimento.selecionar()
 
-        for proc in self.__procedimentos:
-            if proc.descricao.lower() == nome_busca.lower():
-                self.__procedimentos.remove(proc)
+        for procedimento in self.__procedimentos:
+            if procedimento.descricao.lower() == nome_busca.lower():
+                self.__procedimentos.remove(procedimento)
                 self.__tela_procedimento.mostrar_msg(
                     "Procedimento excluído com sucesso!"
                 )
@@ -123,11 +123,11 @@ class ControladorProcedimento:
             )
             return
 
-        for proc in self.__procedimentos:
+        for procedimento in self.__procedimentos:
             dados = {
-                "descricao": proc.descricao,
-                "custo": proc.custo,
-                "profissional_nome": proc.profissional.nome
+                "descricao": procedimento.descricao,
+                "custo": procedimento.custo,
+                "profissional_nome": procedimento.profissional.nome
             }
             self.__tela_procedimento.mostrar_procedimento(dados)
 
