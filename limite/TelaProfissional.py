@@ -21,23 +21,23 @@ class TelaProfissional(AbstractTela):
         nome = self.le_texto_obrigatorio("Nome: ")
         cpf = self.le_texto_obrigatorio("CPF: ")
         celular = self.le_texto_obrigatorio("Celular: ")
-        registro_profissional = self.le_texto_obrigatorio("Registro profissional: ")
         especialidade = self.le_texto_obrigatorio("Especialidade: ")
+        registro_profissional = self.le_texto_obrigatorio("Registro profissional: ")
 
         return {
             "nome": nome,
             "cpf": cpf,
             "celular": celular,
-            "registro_profissional": registro_profissional,
             "especialidade": especialidade,
+            "registro_profissional": registro_profissional,
         }
 
     def mostrar_profissional(self, dados_profissional: dict):
         print("PROFISSIONAL: ", dados_profissional["nome"])
         print("CPF: ", dados_profissional["cpf"])
         print("CELULAR: ", dados_profissional["celular"])
-        print("REGISTRO PROFISSIONAL: ", dados_profissional["registro_profissional"])
         print("ESPECIALIDADE: ", dados_profissional["especialidade"])
+        print("REGISTRO PROFISSIONAL: ", dados_profissional["registro_profissional"])
         print("-" * 30)
 
     def selecionar(self) -> str:
