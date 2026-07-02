@@ -1,31 +1,28 @@
 from entidade.paciente import Paciente
 from limite.TelaPaciente import TelaPaciente
+from dao.PacienteDAO import PacienteDAO
 
 
 class ControladorPaciente:
     def __init__(self, controlador_principal):
         self.__controlador_principal = controlador_principal
         self.__tela_paciente = TelaPaciente(self)
-        self.__pacientes = []
+        self.__paciente_dao = PacienteDAO()
 
     def iniciar(self):
         self.abrir_tela()
 
-    def pegar_paciente_por_cpf(self, cpf: str):
-        for paciente in self.__pacientes:
-            if paciente.cpf == cpf:
-                return paciente
-        return None
-    
+    def pegar_paciente_por_cpf(self, cpf: str) -> Paciente | None:
+        return self.__paciente_dao.get(cpf)
+
     def selecionar_paciente_para_atendimento(self):
-        if len(self.__pacientes) == 0:
+        if len(self.__paciente_dao.get_all()) == 0:
             self.__tela_paciente.mostrar_msg("Nenhum paciente cadastrado.")
             return None
         self.listar_pacientes()
 
         cpf = self.__tela_paciente.selecionar()
         return self.pegar_paciente_por_cpf(cpf)
-    
 
     def incluir_paciente(self):
         dados_paciente = self.__tela_paciente.pegar_dados()
@@ -43,18 +40,18 @@ class ControladorPaciente:
             dados_paciente["data_nascimento"],
         )
 
-        self.__pacientes.append(novo_paciente)
+        self.__paciente_dao.add(novo_paciente)
         self.__tela_paciente.mostrar_msg("Paciente cadastrado com sucesso!")
 
     def alterar_paciente(self) -> None:
-        if len(self.__pacientes) == 0:
+        if len(self.__paciente_dao.get_all()) == 0:
             self.__tela_paciente.mostrar_msg("Nenhum paciente cadastrado.")
             return
 
         self.listar_pacientes()
 
         cpf = self.__tela_paciente.selecionar()
-        paciente = self.pegar_paciente_por_cpf(cpf)
+        paciente: Paciente | None = self.pegar_paciente_por_cpf(cpf)
 
         if paciente is None:
             self.__tela_paciente.mostrar_msg("Paciente não encontrado.")
@@ -69,15 +66,19 @@ class ControladorPaciente:
             self.__tela_paciente.mostrar_msg("Já existe outro paciente com esse CPF.")
             return
 
+        self.__paciente_dao.remove(cpf)
+
         paciente.nome = novos_dados["nome"]
         paciente.cpf = novos_dados["cpf"]
         paciente.celular = novos_dados["celular"]
         paciente.data_nascimento = novos_dados["data_nascimento"]
 
+        self.__paciente_dao.update(paciente)
+
         self.__tela_paciente.mostrar_msg("Paciente alterado com sucesso.")
 
     def excluir_paciente(self) -> None:
-        if len(self.__pacientes) == 0:
+        if len(self.__paciente_dao.get_all()) == 0:
             self.__tela_paciente.mostrar_msg("Nenhum paciente cadastrado.")
             return
 
@@ -90,15 +91,15 @@ class ControladorPaciente:
             self.__tela_paciente.mostrar_msg("Paciente não encontrado.")
             return
 
-        self.__pacientes.remove(paciente)
+        self.__paciente_dao.remove(cpf)
         self.__tela_paciente.mostrar_msg("Paciente removido com sucesso.")
 
     def listar_pacientes(self) -> None:
-        if len(self.__pacientes) == 0:
+        if len(self.__paciente_dao.get_all()) == 0:
             self.__tela_paciente.mostrar_msg("Nenhum paciente cadastrado.")
             return
 
-        for paciente in self.__pacientes:
+        for paciente in self.__paciente_dao.get_all():
             dados_paciente = {
                 "nome": paciente.nome,
                 "cpf": paciente.cpf,
