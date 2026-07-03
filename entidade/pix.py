@@ -4,9 +4,9 @@ from entidade.pagamento import Pagamento
 
 class Pix(Pagamento):
     def __init__(
-        self, data: date, valor_pago: float, cpf_pagador: str, atendimento
+        self, codigo: int, data: date, valor_pago: float, cpf_pagador: str, atendimento
     ) -> None:
-        super().__init__(data, valor_pago, atendimento)
+        super().__init__(codigo, data, valor_pago, atendimento)
         self.__cpf_pagador = cpf_pagador
 
     @property

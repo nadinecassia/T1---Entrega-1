@@ -8,7 +8,8 @@ if TYPE_CHECKING:
 
 
 class Pagamento(ABC):
-    def __init__(self, data: date, valor_pago: float, atendimento: "Atendimento") -> None:
+    def __init__(self, codigo: int,  data: date, valor_pago: float, atendimento: "Atendimento") -> None:
+        self.__codigo = codigo
         self.__data = data
         self.__valor_pago = valor_pago
         self.__atendimento = atendimento
@@ -28,6 +29,10 @@ class Pagamento(ABC):
     @property
     def paciente(self):
         return self.__atendimento.paciente
+    
+    @property
+    def codigo(self) -> int:
+        return self.__codigo
 
     @data.setter
     def data(self, data) -> None:
@@ -40,6 +45,10 @@ class Pagamento(ABC):
     @atendimento.setter
     def atendimento(self, atendimento) -> None:
         self.__atendimento = atendimento
+    
+    @codigo.setter
+    def codigo(self, codigo) -> None:
+        self.__codigo = codigo
 
     @abstractmethod
     def processar_pagamento(self) -> None:

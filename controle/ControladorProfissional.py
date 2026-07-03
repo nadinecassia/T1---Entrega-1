@@ -1,24 +1,22 @@
 from limite.TelaProfissional import TelaProfissional
 from entidade.profissional import Profissional
+from dao.ProfissionalDAO import ProfissionalDAO
 
 
 class ControladorProfissional:
     def __init__(self, controlador_principal):
         self.__tela_profissional = TelaProfissional(self)
-        self.__profissionais = []
+        self.__profissional_dao = ProfissionalDAO()
         self.__controlador_principal = controlador_principal
 
     def iniciar(self):
         self.abrir_tela()
 
-    def pegar_profissional_por_cpf(self, cpf: str):
-        for profissional in self.__profissionais:
-            if profissional.cpf == cpf:
-                return profissional
-        return None
+    def pegar_profissional_por_cpf(self, cpf: str) -> Profissional | None:
+        return self.__profissional_dao.get(cpf)
 
     def selecionar_profissional_para_atendimento(self):
-        if len(self.__profissionais) == 0:
+        if len(self.__profissional_dao.get_all()) == 0:
             self.__tela_profissional.mostrar_msg("Nenhum profissional cadastrado.")
             return None
         self.listar_profissionais()
@@ -30,7 +28,7 @@ class ControladorProfissional:
             self.__tela_profissional.mostrar_msg("Profissional não encontrado.")
             return None
         return profissional
-    
+
     def selecionar_profissional_para_procedimento(self):
         return self.selecionar_profissional_para_atendimento()
 
@@ -53,11 +51,11 @@ class ControladorProfissional:
             dados_profissional["registro_profissional"],
         )
 
-        self.__profissionais.append(novo_profissional)
+        self.__profissional_dao.add(novo_profissional)
         self.__tela_profissional.mostrar_msg("Profissional cadastrado com sucesso!")
 
     def alterar_profissional(self) -> None:
-        if len(self.__profissionais) == 0:
+        if len(self.__profissional_dao.get_all()) == 0:
             self.__tela_profissional.mostrar_msg("Nenhum profissional cadastrado.")
             return
 
@@ -81,16 +79,19 @@ class ControladorProfissional:
             )
             return
 
+        self.__profissional_dao.remove(cpf)
+
         profissional.nome = novos_dados["nome"]
         profissional.cpf = novos_dados["cpf"]
         profissional.celular = novos_dados["celular"]
         profissional.especialidade = novos_dados["especialidade"]
         profissional.registro_profissional = novos_dados["registro_profissional"]
 
+        self.__profissional_dao.update(profissional)
         self.__tela_profissional.mostrar_msg("Profissional alterado com sucesso.")
 
     def excluir_profissional(self) -> None:
-        if len(self.__profissionais) == 0:
+        if len(self.__profissional_dao.get_all()) == 0:
             self.__tela_profissional.mostrar_msg("Nenhum profissional cadastrado.")
             return
 
@@ -103,15 +104,15 @@ class ControladorProfissional:
             self.__tela_profissional.mostrar_msg("Profissional não encontrado.")
             return
 
-        self.__profissionais.remove(profissional)
+        self.__profissional_dao.remove(cpf)
         self.__tela_profissional.mostrar_msg("Profissional removido com sucesso.")
 
     def listar_profissionais(self) -> None:
-        if len(self.__profissionais) == 0:
+        if len(self.__profissional_dao.get_all()) == 0:
             self.__tela_profissional.mostrar_msg("Nenhum profissional cadastrado.")
             return
 
-        for profissional in self.__profissionais:
+        for profissional in self.__profissional_dao.get_all():
             dados_profissional = {
                 "nome": profissional.nome,
                 "cpf": profissional.cpf,

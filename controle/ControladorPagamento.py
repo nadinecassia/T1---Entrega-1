@@ -1,17 +1,32 @@
+from entidade.pagamento import Pagamento
 from entidade.pix import Pix
 from entidade.dinheiro import Dinheiro
 from entidade.cartao import Cartao
 from limite.TelaPagamento import TelaPagamento
+from dao.PagamentoDAO import PagamentoDAO
 
 
 class ControladorPagamento:
     def __init__(self, controlador_principal) -> None:
         self.__controlador_principal = controlador_principal
         self.__tela_pagamento = TelaPagamento(self)
-        self.__pagamentos = []
+        self.__pagamento_dao = PagamentoDAO()
 
     def iniciar(self) -> None:
         self.abrir_tela()
+
+    def __gerar_codigo(self) -> int:
+        pagamentos = self.__pagamento_dao.get_all()
+
+        if len(pagamentos) == 0:
+            return 1
+        
+        maior_codigo = 0
+        for pagamento in pagamentos:
+            if pagamento.codigo > maior_codigo:
+                maior_codigo = pagamento.codigo
+        
+        return maior_codigo + 1
 
     def pegar_atendimentos(self) -> list:
         return self.__controlador_principal.controlador_atendimento.atendimentos
@@ -69,10 +84,12 @@ class ControladorPagamento:
             )
             return None
 
+        codigo_novo = self.__gerar_codigo()
         modalidade = self.__tela_pagamento.mostrar_menu_modalidade()
 
         if modalidade == 1:
             pagamento = Dinheiro(
+                codigo_novo,
                 dados_pagamento["data"],
                 dados_pagamento["valor_pago"],
                 atendimento,
@@ -82,6 +99,7 @@ class ControladorPagamento:
             dados_pix = self.__tela_pagamento.pegar_dados_pix()
 
             pagamento = Pix(
+                codigo_novo,
                 dados_pagamento["data"],
                 dados_pagamento["valor_pago"],
                 dados_pix["cpf_pagador"],
@@ -92,6 +110,7 @@ class ControladorPagamento:
             dados_cartao = self.__tela_pagamento.pegar_dados_cartao()
 
             pagamento = Cartao(
+                codigo_novo,
                 dados_pagamento["data"],
                 dados_pagamento["valor_pago"],
                 dados_cartao["numero_cartao"],
@@ -104,12 +123,12 @@ class ControladorPagamento:
     def remover_pagamento_do_atendimento(self, atendimento) -> None:
         pagamentos_para_remover = []
 
-        for pagamento in self.__pagamentos:
+        for pagamento in self.__pagamento_dao.get_all():
             if pagamento.atendimento == atendimento:
                 pagamentos_para_remover.append(pagamento)
 
         for pagamento in pagamentos_para_remover:
-            self.__pagamentos.remove(pagamento)
+            self.__pagamento_dao.remove(pagamento.codigo)
 
     def incluir_pagamento(self) -> None:
         atendimento = self.selecionar_atendimento()
@@ -125,31 +144,28 @@ class ControladorPagamento:
         pagamento.processar_pagamento()
 
         atendimento.add_pagamentos(pagamento)
-        self.__pagamentos.append(pagamento)
+        self.__pagamento_dao.add(pagamento)
 
         self.__tela_pagamento.mostrar_msg("Pagamento cadastrado com sucesso.")
 
     def listar_pagamentos(self) -> None:
-        if len(self.__pagamentos) == 0:
+        if len(self.__pagamento_dao.get_all()) == 0:
             self.__tela_pagamento.mostrar_msg("Nenhum pagamento cadastrado.")
             return
 
-        for indice, pagamento in enumerate(self.__pagamentos):
+        for pagamento in self.__pagamento_dao.get_all():
             dados_pagamento = {
-                "indice": indice,
+                "codigo": pagamento.codigo,
                 "modalidade": self.identificar_modalidade(pagamento),
                 "data": pagamento.data,
                 "valor_pago": pagamento.valor_pago,
                 "paciente": pagamento.paciente.nome,
             }
 
-        self.__tela_pagamento.mostrar_pagamento(dados_pagamento)
+            self.__tela_pagamento.mostrar_pagamento(dados_pagamento)
 
-    def pegar_pagamento_por_indice(self, indice: int):
-        if indice < 0 or indice >= len(self.__pagamentos):
-            return None
-
-        return self.__pagamentos[indice]
+    def pegar_pagamento_por_codigo(self, codigo: int) -> Pagamento | None:
+        return self.__pagamento_dao.get(codigo)
 
     def identificar_modalidade(self, pagamento) -> str:
         if isinstance(pagamento, Dinheiro):
@@ -164,14 +180,14 @@ class ControladorPagamento:
         return "Pagamento"
 
     def alterar_pagamento(self) -> None:
-        if len(self.__pagamentos) == 0:
+        if len(self.__pagamento_dao.get_all()) == 0:
             self.__tela_pagamento.mostrar_msg("Nenhum pagamento cadastrado.")
             return
 
         self.listar_pagamentos()
 
-        indice = self.__tela_pagamento.selecionar_pagamento()
-        pagamento = self.pegar_pagamento_por_indice(indice)
+        codigo = self.__tela_pagamento.selecionar_pagamento()
+        pagamento = self.pegar_pagamento_por_codigo(codigo)
 
         if pagamento is None:
             self.__tela_pagamento.mostrar_msg("Pagamento não encontrado.")
@@ -207,23 +223,24 @@ class ControladorPagamento:
             pagamento.numero_cartao = dados_cartao["numero_cartao"]
             pagamento.bandeira = dados_cartao["bandeira"]
 
+        self.__pagamento_dao.update(pagamento)
         self.__tela_pagamento.mostrar_msg("Pagamento alterado com sucesso.")
 
     def excluir_pagamento(self) -> None:
-        if len(self.__pagamentos) == 0:
+        if len(self.__pagamento_dao.get_all()) == 0:
             self.__tela_pagamento.mostrar_msg("Nenhum pagamento cadastrado.")
             return
 
         self.listar_pagamentos()
 
-        indice = self.__tela_pagamento.selecionar_pagamento()
-        pagamento = self.pegar_pagamento_por_indice(indice)
+        codigo = self.__tela_pagamento.selecionar_pagamento()
+        pagamento = self.pegar_pagamento_por_codigo(codigo)
 
         if pagamento is None:
             self.__tela_pagamento.mostrar_msg("Pagamento não encontrado.")
             return
 
-        self.__pagamentos.remove(pagamento)
+        self.__pagamento_dao.remove(codigo)
 
         if pagamento in pagamento.atendimento.pagamentos:
             pagamento.atendimento.pagamentos.remove(pagamento)

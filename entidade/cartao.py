@@ -5,13 +5,14 @@ from entidade.pagamento import Pagamento
 class Cartao(Pagamento):
     def __init__(
         self,
+        codigo: int,
         data: date,
         valor_pago: float,
         numero_cartao: str,
         bandeira: str,
         atendimento,
     ) -> None:
-        super().__init__(data, valor_pago, atendimento)
+        super().__init__(codigo, data, valor_pago, atendimento)
         self.__numero_cartao = numero_cartao
         self.__bandeira = bandeira
 
