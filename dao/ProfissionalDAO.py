@@ -10,9 +10,9 @@ class ProfissionalDAO(DAO):
         if (
             (isinstance(profissional.cpf, str))
             and (profissional is not None)
-            and isinstance(profissional, profissional)
+            and isinstance(profissional, Profissional)
         ):
-            super().add(profissional.cpf, profissional)
+            super().add(profissional.cpf, Profissional)
 
     def update(self, profissional: Profissional):
         if (
@@ -20,7 +20,7 @@ class ProfissionalDAO(DAO):
             and (profissional is not None)
             and isinstance(profissional, Profissional)
         ):
-            super().update(profissional.cpf, profissional)
+            super().update(profissional.cpf, Profissional)
     
     def get(self, key: str):
         if isinstance(key, str):
