@@ -1,54 +1,52 @@
 from entidade.procedimento import Procedimento
 from limite.TelaProcedimento import TelaProcedimento
-
+from dao.ProcedimentoDAO import ProcedimentoDAO
 
 class ControladorProcedimento:
     def __init__(self, controlador_principal):
         self.__controlador_principal = controlador_principal
-        self.__procedimentos = []
+        self.__procedimento_dao = ProcedimentoDAO()
         self.__tela_procedimento = TelaProcedimento(self)
-
-    @property
-    def procedimentos(self):
-        return self.__procedimentos
 
     def iniciar(self):
         self.abrir_tela()
 
     def selecionar_procedimento_para_atendimento(self):
-        if len(self.__procedimentos) == 0:
-            self.__tela_procedimento.mostrar_msg("Nenhum procedimento cadastrado no sistema!")
+        procedimentos = self.__procedimento_dao.get_all()
+
+        if not procedimentos:
+            self.__tela_procedimento.mostrar_msg("ERRO: Nenhum procedimento cadastrado!")
             return None
 
-        self.listar_procedimentos()
+        self.__tela_procedimento.mostrar_lista(procedimentos) 
+        descricao = self.__tela_procedimento.selecionar_procedimento()
 
-        descricao_busca = self.__tela_procedimento.selecionar()
+        procedimento_selecionado = self.__procedimento_dao.get(descricao)
 
-        for procedimento in self.__procedimentos:
-            if procedimento.descricao.lower() == descricao_busca.lower():
-                return procedimento
+        if procedimento_selecionado is None:
+            self.__tela_procedimento.mostrar_msg("ERRO: Procedimento não encontrado!")
+            return None
 
-        self.__tela_procedimento.mostrar_msg("ERRO: Procedimento com a descrição informada não foi localizado.")
-        return None
+        return procedimento_selecionado
     
     def remover_procedimentos_do_atendimento(self, atendimento) -> None:
-        procedimentos_para_remover = []
-        for procedimento in self.__procedimentos:
-            if procedimento in atendimento.procedimentos:
-                procedimentos_para_remover.append(procedimento)
-                
-        for procedimento in procedimentos_para_remover:
-            self.__procedimentos.remove(procedimento)
+        descricao = self.__tela_procedimento.selecionar_procedimento_para_remover(atendimento.procedimentos)
+        
+        for p in atendimento.procedimentos:
+            if p.descricao == descricao:
+                atendimento.procedimentos.remove(p)
+                self.__controlador_principal.controlador_atendimento.atualizar_atendimento_dao(atendimento)
+                self.__tela_procedimento.mostrar_msg("Procedimento removido do atendimento!")
+                return
+        
+        self.__tela_procedimento.mostrar_msg("Procedimento não encontrado neste atendimento.")
 
     def incluir_procedimento(self):
         dados_procedimento = self.__tela_procedimento.pegar_dados()
 
-        for procedimento in self.__procedimentos:
-            if procedimento.descricao.lower() == dados_procedimento["descricao"].lower():
-                self.__tela_procedimento.mostrar_msg(
-                    "Já existe um procedimento com essa descrição!"
-                )
-                return
+        if self.__procedimento_dao.get(dados_procedimento["descricao"]) is not None:
+            self.__tela_procedimento.mostrar_msg("Já existe um procedimento com essa descrição!")
+            return
 
         profissional = (
             self.__controlador_principal
@@ -57,9 +55,7 @@ class ControladorProcedimento:
         )
 
         if profissional is None:
-            self.__tela_procedimento.mostrar_msg(
-                "ERRO: É necessário vincular um profissional válido!"
-            )
+            self.__tela_procedimento.mostrar_msg("ERRO: Profissional inválido!")
             return
 
         novo_procedimento = Procedimento(
@@ -68,77 +64,49 @@ class ControladorProcedimento:
             profissional
         )
 
-        self.__procedimentos.append(novo_procedimento)
-        self.__tela_procedimento.mostrar_msg(
-            "Procedimento cadastrado com sucesso!"
-        )
+        self.__procedimento_dao.add(novo_procedimento)
+        self.__tela_procedimento.mostrar_msg("Procedimento cadastrado com sucesso!")
 
     def alterar_procedimento(self):
         nome_busca = self.__tela_procedimento.selecionar()
+        procedimento = self.__procedimento_dao.get(nome_busca)
 
-        for procedimento in self.__procedimentos:
-            if procedimento.descricao.lower() == nome_busca.lower():
-                dados_procedimento = self.__tela_procedimento.pegar_dados()
+        if procedimento is None:
+            self.__tela_procedimento.mostrar_msg("ERRO: Procedimento não encontrado!")
+            return
 
-                if dados_procedimento["descricao"].lower() != procedimento.descricao.lower():
-                    for outro_proc in self.__procedimentos:
-                        if (outro_proc.descricao.lower() ==
-                                dados_procedimento["descricao"].lower()):
-                            self.__tela_procedimento.mostrar_msg(
-                                "ERRO: Já existe outro procedimento "
-                                "com essa nova descrição!"
-                            )
-                            return
+        dados_novos = self.__tela_procedimento.pegar_dados()
 
-                procedimento.descricao = dados_procedimento["descricao"]
-                procedimento.custo = dados_procedimento["custo"]
+        if dados_novos["descricao"] != nome_busca:
+            self.__procedimento_dao.remove(nome_busca)
 
-                novo_prof = (
-                    self.__controlador_principal
-                    .controlador_profissional
-                    .selecionar_profissional_para_procedimento()
-                )
-                if novo_prof is not None:
-                    procedimento.profissional = novo_prof
+        procedimento.descricao = dados_novos["descricao"]
+        procedimento.custo = dados_novos["custo"]
 
-                self.__tela_procedimento.mostrar_msg(
-                    "Procedimento alterado com sucesso!"
-                )
-                return
-
-        self.__tela_procedimento.mostrar_msg(
-            "ERRO: Não existe um procedimento com essa descrição!"
-        )
+        self.__procedimento_dao.add(procedimento)
+        self.__tela_procedimento.mostrar_msg("Procedimento alterado com sucesso!")
 
     def excluir_procedimento(self):
         nome_busca = self.__tela_procedimento.selecionar()
-
-        for procedimento in self.__procedimentos:
-            if procedimento.descricao.lower() == nome_busca.lower():
-                self.__procedimentos.remove(procedimento)
-                self.__tela_procedimento.mostrar_msg(
-                    "Procedimento excluído com sucesso!"
-                )
-                return
-
-        self.__tela_procedimento.mostrar_msg(
-            "ERRO: Não existe um procedimento com essa descrição!"
-        )
+        
+        if self.__procedimento_dao.get(nome_busca) is not None:
+            self.__procedimento_dao.remove(nome_busca)
+            self.__tela_procedimento.mostrar_msg("Procedimento excluído!")
+        else:
+            self.__tela_procedimento.mostrar_msg("ERRO: Procedimento não encontrado!")
 
     def listar_procedimentos(self):
-        if len(self.__procedimentos) == 0:
-            self.__tela_procedimento.mostrar_msg(
-                "Nenhum procedimento cadastrado até o momento!"
-            )
+        procedimentos = self.__procedimento_dao.get_all()
+        if not procedimentos:
+            self.__tela_procedimento.mostrar_msg("Nenhum procedimento cadastrado!")
             return
 
-        for procedimento in self.__procedimentos:
-            dados = {
-                "descricao": procedimento.descricao,
-                "custo": procedimento.custo,
-                "profissional_nome": procedimento.profissional.nome
-            }
-            self.__tela_procedimento.mostrar_procedimento(dados)
+        for p in procedimentos:
+            self.__tela_procedimento.mostrar_procedimento({
+                "descricao": p.descricao,
+                "custo": p.custo,
+                "profissional_nome": p.profissional.nome
+            })
 
     def abrir_tela(self):
         lista_opcoes = {
