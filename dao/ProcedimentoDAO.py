@@ -10,8 +10,11 @@ class ProcedimentoDAO(DAO):
         if isinstance(procedimento, Procedimento) and isinstance(procedimento.descricao, str) and procedimento is not None:
             super().add(procedimento.descricao, procedimento)
 
-    def update(self, procedimento: Procedimento):
+    def update(self, procedimento: Procedimento, descricao_antiga: str):
         if isinstance(procedimento, Procedimento) and isinstance(procedimento.descricao, str) and procedimento is not None:
+            if descricao_antiga != procedimento.descricao:
+                self.remove(descricao_antiga)
+
             super().update(procedimento.descricao, procedimento)
 
     def get(self, descricao: str):

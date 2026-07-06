@@ -10,8 +10,11 @@ class ClinicaDAO(DAO):
         if isinstance(clinica, Clinica) and isinstance(clinica.nome, str) and clinica is not None:
             super().add(clinica.nome, clinica)
 
-    def update(self, clinica: Clinica):
+    def update(self, clinica: Clinica, nome_antigo: str):
         if isinstance(clinica, Clinica) and isinstance(clinica.nome, str) and clinica is not None:
+            if nome_antigo != clinica.nome:
+                self.remove(nome_antigo)
+
             super().update(clinica.nome, clinica)
 
     def get(self, nome: str):
