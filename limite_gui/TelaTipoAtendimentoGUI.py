@@ -10,22 +10,23 @@ class TelaTipoAtendimentoGUI(AbstractTelaGUI):
         layout = [
             [sg.Text('Tipos de Atendimento', font=("Arial", 18, "bold"), justification="center", expand_x=True)],
             [sg.HorizontalSeparator()],
-            [sg.Button('Incluir Tipo', key=1, size=(30, 2))],
-            [sg.Button('Alterar Tipo', key=2, size=(30, 2))],
-            [sg.Button('Excluir Tipo', key=3, size=(30, 2))],
-            [sg.Button('Listar Tipos', key=4, size=(30, 2))],
-            [sg.Button('Voltar', key=0, size=(30, 1))]
+            [sg.Button('Incluir Tipo', size=(30, 2))],
+            [sg.Button('Alterar Tipo', size=(30, 2))],
+            [sg.Button('Excluir Tipo', size=(30, 2))],
+            [sg.Button('Listar Tipos', size=(30, 2))],
+            [sg.Button('Voltar', size=(30, 1))]
         ]
 
         window = sg.Window('Sistema - Tipos de Atendimento', layout, size=(400, 380), element_justification="center")
         
-        button, values = window.read()
+        evento, valores = window.read()
+
         window.close()
 
-        if button is None or button == 0:
-            return 0
+        if evento in (sg.WIN_CLOSED, "Voltar"):
+            return "Voltar"
             
-        return button
+        return evento
 
     def pegar_dados(self) -> dict:
         layout = [

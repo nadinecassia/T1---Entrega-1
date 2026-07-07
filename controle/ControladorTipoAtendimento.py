@@ -97,22 +97,22 @@ class ControladorTipoAtendimento:
         self.__tela_tipo_atendimento.tabela_tipos(tipos, selecionar=False)
 
     def abrir_tela(self) -> None:
-        lista_opcoes = {
-            1: self.incluir_tipo,
-            2: self.alterar_tipo_atendimento,
-            3: self.excluir_tipo_atendimento,
-            4: self.listar_tipos_atendimento,
-            0: self.voltar
-        }
-
         while True:
-            opcao_escolhida = self.__tela_tipo_atendimento.mostrar_menu()
+            opcao = self.__tela_tipo_atendimento.mostrar_menu()
+            if opcao == "Incluir Tipo":
+                self.incluir_tipo()
             
-            if opcao_escolhida == 0:
+            elif opcao == "Alterar Tipo":
+                self.alterar_tipo_atendimento()
+            
+            elif opcao == "Excluir Tipo":
+                self.excluir_tipo_atendimento()
+
+            elif opcao == "Listar Tipos":
+                self.listar_tipos_atendimento()
+            
+            elif opcao == "Voltar":
                 break
-                
-            funcao_escolhida = lista_opcoes[opcao_escolhida]
-            funcao_escolhida()
     
     def voltar(self) -> None:
         return

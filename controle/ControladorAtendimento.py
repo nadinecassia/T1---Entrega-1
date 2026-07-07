@@ -172,7 +172,7 @@ class ControladorAtendimento:
                 self.listar_atendimentos()
             elif opcao == "Registrar Procedimento":
                 self.registrar_procedimento_em_atendimento()
-            elif opcao == 0:
+            elif opcao == "Voltar":
                 break
 
     def voltar(self):

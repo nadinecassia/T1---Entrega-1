@@ -130,7 +130,7 @@ class ControladorProcedimento:
             elif opcao == "Listar Procedimentos":
                 self.listar_procedimentos()
             
-            elif opcao == 0:
+            elif opcao == "Voltar":
                 break
 
     def voltar(self):

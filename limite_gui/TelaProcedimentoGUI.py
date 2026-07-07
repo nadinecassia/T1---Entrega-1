@@ -14,7 +14,7 @@ class TelaProcedimentoGUI(AbstractTelaGUI):
             [sg.Button('Alterar Procedimento', size=(25, 2))],
             [sg.Button('Excluir Procedimento', size=(25, 2))],
             [sg.Button('Listar Procedimentos', size=(25, 2))],
-            [sg.Button('Voltar', key=0, size=(25, 1))]
+            [sg.Button('Voltar', size=(25, 1))]
         ]
 
         window = sg.Window(
@@ -25,13 +25,14 @@ class TelaProcedimentoGUI(AbstractTelaGUI):
             finalize=True
         )
         
-        button, values = window.read()
+        evento, valores = window.read()
+
         window.close()
 
-        if button is None or button == 0:
-            return 0
+        if evento in (sg.WIN_CLOSED, "Voltar"):
+            return "Voltar"
             
-        return button
+        return evento
 
     def pegar_dados(self) -> dict:
         layout = [

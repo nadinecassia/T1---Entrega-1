@@ -102,7 +102,7 @@ class ControladorClinica:
             elif opcao == "Listar Clínicas":
                 self.listar_clinicas()
             
-            elif opcao == 0:
+            elif opcao == "Voltar":
                 break
 
     def voltar(self):
