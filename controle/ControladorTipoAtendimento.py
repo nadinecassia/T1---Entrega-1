@@ -1,5 +1,5 @@
 from entidade.TipoAtendimento import TipoAtendimento
-from limite.TelaTipoAtendimento import TelaTipoAtendimento
+from limite_gui.TelaTipoAtendimentoGUI import TelaTipoAtendimentoGUI
 from dao.TipoAtendimentoDAO import TipoAtendimentoDAO
 
 
@@ -7,7 +7,7 @@ class ControladorTipoAtendimento:
     def __init__(self, controlador_principal):
         self.__controlador_principal = controlador_principal
         self.__tipo_atendimento_dao = TipoAtendimentoDAO()
-        self.__tela_tipo_atendimento = TelaTipoAtendimento(self)
+        self.__tela_tipo_atendimento = TelaTipoAtendimentoGUI(self)
     
     def iniciar(self):
         self.abrir_tela()
@@ -33,6 +33,10 @@ class ControladorTipoAtendimento:
     
     def incluir_tipo(self):
         dados_tipo = self.__tela_tipo_atendimento.pegar_dados()
+
+        if dados_tipo is None:
+            return
+
         tipo_existente = self.pegar_tipo_por_nome(dados_tipo["nome"])
 
         if tipo_existente is not None:
@@ -52,6 +56,10 @@ class ControladorTipoAtendimento:
     def alterar_tipo_atendimento(self) -> None:
         self.listar_tipos_atendimento()
         nome = self.__tela_tipo_atendimento.selecionar()
+
+        if nome is None:
+            return
+
         tipo = self.pegar_tipo_por_nome(nome)
 
         if tipo is None:
@@ -59,6 +67,10 @@ class ControladorTipoAtendimento:
             return
         
         novos_dados = self.__tela_tipo_atendimento.pegar_dados()
+
+        if novos_dados is None:
+            return
+        
         tipo.nome = novos_dados["nome"]
         tipo.descricao = novos_dados["descricao"]
         
@@ -68,6 +80,10 @@ class ControladorTipoAtendimento:
     def excluir_tipo_atendimento(self) -> None:
         self.listar_tipos_atendimento()
         nome = self.__tela_tipo_atendimento.selecionar()
+
+        if nome is None:
+            return
+
         tipo = self.pegar_tipo_por_nome(nome)
 
         if tipo is None:
