@@ -1,10 +1,10 @@
-from limite.TelaRelatorio import TelaRelatorio
+from limite_gui.TelaRelatorioGUI import TelaRelatorioGUI
 
 
 class ControladorRelatorio:
     def __init__(self, controlador_principal):
         self.__controlador_principal = controlador_principal
-        self.__tela_relatorio = TelaRelatorio(self)
+        self.__tela_relatorio = TelaRelatorioGUI(self)
 
     def iniciar(self):
         self.abrir_tela()
