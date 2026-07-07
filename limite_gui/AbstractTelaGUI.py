@@ -75,3 +75,13 @@ class AbstractTelaGUI(ABC):
         except ValueError:
             self.mostrar_mensagem("Horário inválido. Digite no formato HH:MM")
             return None
+    
+    def validar_registro_profissional(self, registro):
+        if registro.isdigit() and len(registro) >= 6:
+                return registro
+        else:
+            self.mostrar_mensagem(
+                "O registro profissional deve conter apenas números e no mínimo 6 dígitos."
+            )
+            return None
+
