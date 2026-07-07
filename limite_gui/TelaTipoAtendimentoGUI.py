@@ -22,7 +22,7 @@ class TelaTipoAtendimentoGUI(AbstractTelaGUI):
         button, values = window.read()
         window.close()
 
-        if button is None:
+        if button is None or button == 0:
             return 0
             
         return button
@@ -50,23 +50,38 @@ class TelaTipoAtendimentoGUI(AbstractTelaGUI):
             if nome and descricao:
                 window.close()
                 return {"nome": nome, "descricao": descricao}
+    
+    def tabela_tipos(self, tipos, selecionar=False):
+        # A chave no DAO é o código (int)
+        dados = [[t.codigo, t.nome, t.descricao] for t in tipos]
+        
+        layout = [
+            [sg.Table(values=dados,
+                      headings=["Código", "Nome", "Descrição"],
+                      key="tabela", auto_size_columns=True, justification="left",
+                      expand_x=True, expand_y=True, enable_events=True,
+                      select_mode=sg.TABLE_SELECT_MODE_BROWSE)]
+        ]
 
-    def mostrar_tipo_atendimento(self, dados_tipo: dict):
-        mensagem = (
-            f"NOME: {dados_tipo['nome']}\n"
-            f"DESCRIÇÃO: {dados_tipo['descricao']}"
-        )
-        sg.popup(mensagem, title="Detalhes do Tipo")
+        if selecionar:
+            layout.append([sg.Button("Selecionar"), sg.Button("Cancelar")])
+        else:
+            layout.append([sg.Button("Fechar")])
 
-    def selecionar(self) -> str:
+        window = sg.Window("Tipos de Atendimento Cadastrados", layout, size=(600, 400))
+        
         while True:
-            texto = sg.popup_get_text("Digite o nome exato do tipo de atendimento:", title="Selecionar Tipo")
-            if texto is None:
+            evento, valores = window.read()
+            if evento in (sg.WIN_CLOSED, "Fechar", "Cancelar"):
+                window.close()
                 return None
-            
-            texto_validado = self.validar_texto(texto)
-            if texto_validado:
-                return texto_validado
+            if evento == "Selecionar":
+                if not valores["tabela"]:
+                    self.mostrar_mensagem("Selecione um tipo.")
+                    continue
+                indice = valores["tabela"][0]
+                window.close()
+                return tipos[indice].codigo
 
     def mostrar_msg(self, msg: str):
         self.mostrar_mensagem(msg)

@@ -1,6 +1,5 @@
 from entidade.atendimento import Atendimento
 from limite_gui.TelaAtendimentoGUI import TelaAtendimentoGUI
-from datetime import date
 from dao.AtendimentoDAO import AtendimentoDAO
 
 class ControladorAtendimento:
@@ -20,32 +19,25 @@ class ControladorAtendimento:
         self.abrir_tela()
 
     def incluir_atendimento(self):
-        nome_clinica = self.__tela_atendimento.le_texto_obrigatorio("Digite o nome exato da clínica: ")
-        if nome_clinica is None: return
-        
-        clinica = self.__controlador_principal.controlador_clinica.pegar_clinica_por_nome(nome_clinica)
-        if not clinica:
-            self.__tela_atendimento.mostrar_msg("ERRO: Clínica não cadastrada no sistema!")
-            return
+        clinica = self.__controlador_principal.controlador_clinica.selecionar_clinica_por_tabela()
+        if clinica is None: 
+            return 
 
         paciente = self.__controlador_principal.controlador_paciente.selecionar_paciente_para_atendimento()
-        if not paciente:
+        if paciente is None:
             return
 
         profissional = self.__controlador_principal.controlador_profissional.selecionar_profissional_para_atendimento()
-        if not profissional:
+        if profissional is None:
             return
 
-        nome_tipo = self.__tela_atendimento.le_texto_obrigatorio("Digite o nome do Tipo de Atendimento: ")
-        if nome_tipo is None: return
-
-        tipo_atendimento = self.__controlador_principal.controlador_tipo_atendimento.pegar_tipo_por_nome(nome_tipo)
-        if not tipo_atendimento:
-            self.__tela_atendimento.mostrar_msg("ERRO: Tipo de atendimento não cadastrado!")
+        tipo_atendimento = self.__controlador_principal.controlador_tipo_atendimento.selecionar_tipo_por_tabela()
+        if tipo_atendimento is None:
             return
 
         dados_tela = self.__tela_atendimento.pegar_dados()
-        if dados_tela is None: return
+        if dados_tela is None: 
+            return
 
         if paciente.calcular_idade() < 18:
             self.__tela_atendimento.mostrar_msg(f"O paciente {paciente.nome} tem {paciente.calcular_idade()} anos. Somente maiores de 18 anos podem realizar atendimentos de forma independente!")
@@ -70,8 +62,14 @@ class ControladorAtendimento:
         self.__tela_atendimento.mostrar_msg("Atendimento agendado com sucesso!")
 
     def alterar_atendimento(self):
-        busca = self.__tela_atendimento.selecionar()
-        if busca is None: return
+        atendimentos = self.__atendimento_dao.get_all()
+        if not atendimentos:
+            self.__tela_atendimento.mostrar_msg("Nenhum atendimento agendado.")
+            return
+
+        busca = self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=True)
+        if busca is None:
+            return
 
         cpf_busca, data_busca = busca
 
@@ -82,6 +80,7 @@ class ControladorAtendimento:
             return
 
         novos_dados = self.__tela_atendimento.pegar_dados()
+
         if novos_dados is None: return
 
         self.__atendimento_dao.remove(atendimento.paciente.cpf, atendimento.data)
@@ -95,10 +94,17 @@ class ControladorAtendimento:
         self.__tela_atendimento.mostrar_msg("Atendimento alterado com sucesso!")
 
     def registrar_procedimento_em_atendimento(self):
-        busca = self.__tela_atendimento.selecionar()
-        if busca is None: return
+        atendimentos = self.__atendimento_dao.get_all()
+        if not atendimentos:
+            self.__tela_atendimento.mostrar_msg("Nenhum atendimento agendado.")
+            return
+
+        busca = self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=True)
+        if busca is None:
+            return
 
         cpf_busca, data_busca = busca
+
         atendimento = self.__atendimento_dao.get(cpf_busca, data_busca)
 
         if atendimento is None:
@@ -139,18 +145,18 @@ class ControladorAtendimento:
             self.__tela_atendimento.mostrar_atendimento(dados)
 
     def excluir_atendimento(self):
-        busca = self.__tela_atendimento.selecionar()
-        if busca is None: return
+        atendimentos = self.__atendimento_dao.get_all()
+        if not atendimentos:
+            self.__tela_atendimento.mostrar_msg("Nenhum atendimento agendado.")
+            return
+
+        busca = self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=True)
+        if busca is None:
+            return
 
         cpf_busca, data_busca = busca
-
-        atendimento = self.__atendimento_dao.get(cpf_busca, data_busca)
-
-        if atendimento is not None:
-            self.__atendimento_dao.remove(atendimento.paciente.cpf, atendimento.data)
-            self.__tela_atendimento.mostrar_msg("Atendimento cancelado com sucesso!")
-        else:
-            self.__tela_atendimento.mostrar_msg("ERRO: Atendimento não localizado.")
+        self.__atendimento_dao.remove(cpf_busca, data_busca)
+        self.__tela_atendimento.mostrar_msg("Atendimento excluído com sucesso!")
 
     def abrir_tela(self):
         while True:

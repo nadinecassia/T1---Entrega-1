@@ -37,19 +37,21 @@ class ControladorClinica:
         self.__tela_clinica.mostrar_mensagem("Clínica cadastrada com sucesso!")
 
     def alterar_clinica(self):
-        nome_busca = self.__tela_clinica.le_texto_obrigatorio("Digite o nome exato da clínica que deseja alterar: ")
+        clinicas = self.__clinica_dao.get_all()
+        if len(clinicas) == 0:
+            self.__tela_clinica.mostrar_mensagem("Nenhuma clínica cadastrada.")
+            return
+
+        nome_busca = self.__tela_clinica.tabela_clinicas(clinicas, selecionar=True)
 
         if nome_busca is None:
             return
 
         clinica = self.__clinica_dao.get(nome_busca)
-        
-        if clinica is None:
-            self.__tela_clinica.mostrar_mensagem("ERRO: Clínica não encontrada.")
-            return
 
-        self.__tela_clinica.mostrar_mensagem("Informe os novos dados da clínica:")
         dados_novos = self.__tela_clinica.pegar_dados()
+        if dados_novos is None:
+            return
 
         if dados_novos["nome"] != nome_busca:
             self.__clinica_dao.remove(nome_busca)
@@ -60,39 +62,30 @@ class ControladorClinica:
         clinica.horario_aberto = dados_novos["horario_aberto"]
         clinica.horario_fechado = dados_novos["horario_fechado"]
 
-        self.__clinica_dao.add(clinica)
-        
+        self.__clinica_dao.update(clinica)
         self.__tela_clinica.mostrar_mensagem("Clínica alterada com sucesso!")
 
     def excluir_clinica(self):
-        nome = self.__tela_clinica.le_texto_obrigatorio("Digite o nome da clínica que deseja excluir: ")
-
-        if nome is None:
+        clinicas = self.__clinica_dao.get_all()
+        if len(clinicas) == 0:
+            self.__tela_clinica.mostrar_mensagem("Nenhuma clínica cadastrada.")
             return
 
-        clinica = self.__clinica_dao.get(nome)
-        
-        if clinica is not None:
-            self.__clinica_dao.remove(nome)
-            self.__tela_clinica.mostrar_mensagem("Clínica excluída com sucesso!")
-        else:
-            self.__tela_clinica.mostrar_mensagem("ERRO: Não existe uma clínica com esse nome!")
+        nome_selecionado = self.__tela_clinica.tabela_clinicas(clinicas, selecionar=True)
+
+        if nome_selecionado is None:
+            return
+
+        self.__clinica_dao.remove(nome_selecionado)
+        self.__tela_clinica.mostrar_mensagem("Clínica excluída com sucesso!")
 
     def listar_clinicas(self):
         clinicas = self.__clinica_dao.get_all()
         if len(clinicas) == 0:
-            self.__tela_clinica.mostrar_mensagem("Nenhuma clínica cadastrada até o momento!")
+            self.__tela_clinica.mostrar_mensagem("Nenhuma clínica cadastrada!")
             return
 
-        for clinica in clinicas:
-            dados = {
-                "nome": clinica.nome,
-                "descricao": clinica.descricao,
-                "cidade": clinica.cidade,
-                "horario_aberto": clinica.horario_aberto,
-                "horario_fechado": clinica.horario_fechado
-            }
-            self.__tela_clinica.mostrar_clinica(dados)
+        self.__tela_clinica.tabela_clinicas(clinicas, selecionar=False)
         
     def abrir_tela(self) -> None:
         while True:

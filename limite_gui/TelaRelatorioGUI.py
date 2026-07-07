@@ -22,7 +22,7 @@ class TelaRelatorioGUI(AbstractTelaGUI):
         button, values = window.read()
         window.close()
 
-        if button is None:
+        if button is None or button == 0:
             return 0
             
         return button

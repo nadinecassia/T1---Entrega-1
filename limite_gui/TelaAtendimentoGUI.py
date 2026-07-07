@@ -23,7 +23,7 @@ class TelaAtendimentoGUI(AbstractTelaGUI):
         button, values = window.read()
         window.close()
 
-        if button is None:
+        if button is None or button == 0:
             return 0
             
         return button
@@ -60,6 +60,37 @@ class TelaAtendimentoGUI(AbstractTelaGUI):
                     "hora_fim": hora_fim,
                     "valor": valor
                 }
+    
+    def tabela_atendimentos(self, atendimentos, selecionar=False):
+        dados = [[a.data.strftime("%d/%m/%Y"), a.paciente.nome, a.paciente.cpf, a.clinica.nome, a.tipo_atendimento.nome] for a in atendimentos]
+
+        layout = [
+            [sg.Table(values=dados,
+                      headings=["Data", "Paciente", "CPF", "Clínica", "Tipo"],
+                      key="tabela", auto_size_columns=True, justification="left",
+                      expand_x=True, expand_y=True, enable_events=True,
+                      select_mode=sg.TABLE_SELECT_MODE_BROWSE)]
+        ]
+
+        if selecionar:
+            layout.append([sg.Button("Selecionar"), sg.Button("Cancelar")])
+        else:
+            layout.append([sg.Button("Fechar")])
+
+        window = sg.Window("Atendimentos Agendados", layout, size=(800, 400))
+        
+        while True:
+            evento, valores = window.read()
+            if evento in (sg.WIN_CLOSED, "Fechar", "Cancelar"):
+                window.close()
+                return None
+            if evento == "Selecionar":
+                if not valores["tabela"]:
+                    self.mostrar_mensagem("Selecione um atendimento.")
+                    continue
+                indice = valores["tabela"][0]
+                window.close()
+                return (atendimentos[indice].paciente.cpf, atendimentos[indice].data)
 
     def mostrar_atendimento(self, dados_atendimento: dict):
         procs = dados_atendimento.get('procedimentos', [])
@@ -77,38 +108,5 @@ class TelaAtendimentoGUI(AbstractTelaGUI):
         )
         sg.popup(mensagem, title="Detalhes do Atendimento")
 
-    def selecionar(self) -> tuple:
-        layout = [
-            [sg.Text('Buscar Atendimento', font=("Arial", 15, "bold"))],
-            [sg.Text('CPF do Paciente (11 dígitos):', size=(25,1)), sg.InputText(key='cpf')],
-            [sg.Text('Data do Atendimento (DD/MM/AAAA):', size=(25,1)), sg.InputText(key='data')],
-            [sg.Button('Buscar'), sg.Button('Cancelar')]
-        ]
-
-        window = sg.Window('Selecionar Atendimento', layout)
-
-        while True:
-            button, values = window.read()
-
-            if button in (None, 'Cancelar'):
-                window.close()
-                return None
-
-            cpf_validado = self.validar_cpf(values['cpf'])
-            data_validada = self.validar_data(values['data'])
-
-            if cpf_validado and data_validada:
-                window.close()
-                return (cpf_validado, data_validada)
-
     def mostrar_msg(self, msg: str):
         self.mostrar_mensagem(msg)
-
-    def le_texto_obrigatorio(self, mensagem: str):
-        while True:
-            texto = sg.popup_get_text(mensagem, title="Entrada de Dados")
-            if texto is None:
-                return None
-            texto_validado = self.validar_texto(texto)
-            if texto_validado:
-                return texto_validado
