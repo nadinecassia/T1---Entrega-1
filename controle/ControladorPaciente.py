@@ -6,7 +6,7 @@ from dao.PacienteDAO import PacienteDAO
 class ControladorPaciente:
     def __init__(self, controlador_principal):
         self.__controlador_principal = controlador_principal
-        self.__tela_paciente = TelaPacienteGUI()
+        self.__tela_paciente = TelaPacienteGUI(self)
         self.__paciente_dao = PacienteDAO()
 
     def iniciar(self):
@@ -19,9 +19,15 @@ class ControladorPaciente:
         if len(self.__paciente_dao.get_all()) == 0:
             self.__tela_paciente.mostrar_mensagem("Nenhum paciente cadastrado.")
             return None
-        self.listar_pacientes()
 
-        cpf = self.__tela_paciente.selecionar()
+        cpf = self.__tela_paciente.tabela_pacientes(
+            self.__paciente_dao.get_all(),
+            selecionar=True
+        )
+
+        if cpf is None:
+            return None
+        
         return self.pegar_paciente_por_cpf(cpf)
 
     def incluir_paciente(self):
@@ -50,22 +56,25 @@ class ControladorPaciente:
             self.__tela_paciente.mostrar_mensagem("Nenhum paciente cadastrado.")
             return
 
-        self.listar_pacientes()
+        cpf = self.__tela_paciente.tabela_pacientes(
+            self.__paciente_dao.get_all(),
+            selecionar=True
+        )
 
-        cpf = self.__tela_paciente.selecionar()
         if cpf is None:
             return
+        
         paciente: Paciente | None = self.pegar_paciente_por_cpf(cpf)
 
         if paciente is None:
             self.__tela_paciente.mostrar_mensagem("Paciente não encontrado.")
             return
-        
+
         dados_antigos = {
             "nome": paciente.nome,
             "cpf": paciente.cpf,
             "celular": paciente.celular,
-            "data_nascimento": paciente.data_nascimento
+            "data_nascimento": paciente.data_nascimento,
         }
 
         novos_dados = self.__tela_paciente.abrir_janela_cadastro(dados_antigos)
@@ -77,7 +86,9 @@ class ControladorPaciente:
         paciente_novo_cpf = self.pegar_paciente_por_cpf(novos_dados["cpf"])
 
         if paciente_novo_cpf is not None and paciente_novo_cpf != paciente:
-            self.__tela_paciente.mostrar_mensagem("Já existe outro paciente com esse CPF.")
+            self.__tela_paciente.mostrar_mensagem(
+                "Já existe outro paciente com esse CPF."
+            )
             return
 
         self.__paciente_dao.remove(cpf)
@@ -96,13 +107,14 @@ class ControladorPaciente:
             self.__tela_paciente.mostrar_mensagem("Nenhum paciente cadastrado.")
             return
 
-        self.listar_pacientes()
-
-        cpf = self.__tela_paciente.selecionar()
+        cpf = self.__tela_paciente.tabela_pacientes(
+            self.__paciente_dao.get_all(),
+            selecionar=True
+        )
 
         if cpf is None:
             return
-        
+
         paciente = self.pegar_paciente_por_cpf(cpf)
 
         if paciente is None:
@@ -113,36 +125,31 @@ class ControladorPaciente:
         self.__tela_paciente.mostrar_mensagem("Paciente removido com sucesso.")
 
     def listar_pacientes(self) -> None:
-        if len(self.__paciente_dao.get_all()) == 0:
-            self.__tela_paciente.mostrar_mensagem("Nenhum paciente cadastrado.")
+        pacientes = self.__paciente_dao.get_all()
+
+        if len(pacientes) == 0:
+            self.__tela_paciente.mostrar_mensagem(
+                "Nenhum paciente cadastrado."
+            )
             return
 
-        for paciente in self.__paciente_dao.get_all():
-            dados_paciente = {
-                "nome": paciente.nome,
-                "cpf": paciente.cpf,
-                "celular": paciente.celular,
-                "data_nascimento": paciente.data_nascimento,
-                "idade": paciente.calcular_idade(),
-            }
-
-            self.__tela_paciente.mostrar_paciente(dados_paciente)
+        self.__tela_paciente.tabela_pacientes(pacientes)
 
     def abrir_tela(self) -> None:
         while True:
             opcao = self.__tela_paciente.mostrar_menu()
             if opcao == "Incluir Paciente":
                 self.incluir_paciente()
-            
+
             elif opcao == "Alterar Paciente":
                 self.alterar_paciente()
-            
+
             elif opcao == "Excluir Paciente":
                 self.excluir_paciente()
 
             elif opcao == "Listar Pacientes":
                 self.listar_pacientes()
-            
+
             elif opcao == "Voltar":
                 break
 

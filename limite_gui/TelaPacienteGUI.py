@@ -3,9 +3,11 @@ from limite_gui.AbstractTelaGUI import AbstractTelaGUI
 
 
 class TelaPacienteGUI(AbstractTelaGUI):
-    def __init__(self):
+    def __init__(self, controlador):
         super().__init__()
+        self.__controlador = controlador
         
+    def mostrar_menu(self):
         layout = [
             [sg.Text(
                 "Gerenciamento de Pacientes",
@@ -13,33 +15,32 @@ class TelaPacienteGUI(AbstractTelaGUI):
                 justification = "center",
                 expand_x = True
             )],
-        [sg.HorizontalSeparator()],
-        [sg.Button("Incluir Paciente", size = (25, 2))],
-        [sg.Button("Alterar Paciente", size = (25, 2))],
-        [sg.Button("Excluir Paciente", size = (25, 2))],
-        [sg.Button("Listar Pacientes", size = (25, 2))],
-       
-        [sg.Push(), sg.Button("Voltar", size = (10,1))]
+            [sg.HorizontalSeparator()],
+            [sg.Button("Incluir Paciente", size = (25, 2))],
+            [sg.Button("Alterar Paciente", size = (25, 2))],
+            [sg.Button("Excluir Paciente", size = (25, 2))],
+            [sg.Button("Listar Pacientes", size = (25, 2))],
+        
+            [sg.Push(), sg.Button("Voltar", size = (10,1))]
         ]
 
-        self.window = sg.Window(
+        window = sg.Window(
             "Pacientes",
             layout,
             size=(500, 450),
             element_justification="center",
             finalize=True
         )
-    
-    def mostrar_menu(self):
-        evento, valores = self.window.read()
 
-        if evento == sg.WIN_CLOSED:
+        evento, valores = window.read()
+
+        window.close()
+
+        if evento in (sg.WIN_CLOSED, "Voltar"):
             return "Voltar"
-        
+            
         return evento
     
-    def fechar(self):
-        self.window.close()
     
     def abrir_janela_cadastro(self, dados_antigos = None):
         if dados_antigos is None:
@@ -57,7 +58,7 @@ class TelaPacienteGUI(AbstractTelaGUI):
           [sg.Text("Nome"), sg.Input(default_text=nome_padrao, key="nome")],
         [sg.Text("CPF"), sg.Input(default_text=cpf_padrao, key="cpf")],
         [sg.Text("Celular"), sg.Input(default_text=celular_padrao, key="celular")],
-        [sg.Text("Nascimento"), sg.Input(default_text=data_padrao, key="data")],
+        [sg.Text("Data de Nascimento"), sg.Input(default_text=data_padrao, key="data")],
         [sg.Button("Salvar"), sg.Button("Cancelar")]  
         ]
 
@@ -95,4 +96,74 @@ class TelaPacienteGUI(AbstractTelaGUI):
                     "celular": celular_validado,
                     "data_nascimento": data_validada
                 }
+            
+    def tabela_pacientes(self, pacientes, selecionar=False):
 
+        dados = []
+
+        for paciente in pacientes:
+            dados.append([
+                paciente.nome,
+                paciente.cpf,
+                paciente.celular,
+                paciente.data_nascimento.strftime("%d/%m/%Y"),
+                paciente.calcular_idade()
+            ])
+
+        layout = [
+            [
+                sg.Table(
+                    values=dados,
+                    headings=[
+                        "Nome",
+                        "CPF",
+                        "Celular",
+                        "Nascimento",
+                        "Idade"
+                    ],
+                    key="tabela",
+                    auto_size_columns=True,
+                    justification="left",
+                    expand_x=True,
+                    expand_y=True,
+                    enable_events=True,
+                    select_mode=sg.TABLE_SELECT_MODE_BROWSE
+                )
+            ]
+        ]
+
+        if selecionar:
+            layout.append([
+                sg.Button("Selecionar"),
+                sg.Button("Cancelar")
+            ])
+        else:
+            layout.append([
+                sg.Button("Fechar")
+            ])
+
+        window = sg.Window(
+            "Pacientes",
+            layout,
+            size=(900, 400)
+        )
+
+        while True:
+
+            evento, valores = window.read()
+
+            if evento in (sg.WIN_CLOSED, "Fechar", "Cancelar"):
+                window.close()
+                return None
+
+            if evento == "Selecionar":
+
+                if len(valores["tabela"]) == 0:
+                    self.mostrar_mensagem("Selecione um paciente.")
+                    continue
+
+                indice = valores["tabela"][0]
+
+                window.close()
+
+                return pacientes[indice].cpf
