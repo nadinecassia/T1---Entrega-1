@@ -2,14 +2,14 @@ from entidade.pagamento import Pagamento
 from entidade.pix import Pix
 from entidade.dinheiro import Dinheiro
 from entidade.cartao import Cartao
-from limite.TelaPagamento import TelaPagamento
+from limite_gui.TelaPagamentoGUI import TelaPagamentoGUI
 from dao.PagamentoDAO import PagamentoDAO
 
 
 class ControladorPagamento:
     def __init__(self, controlador_principal) -> None:
         self.__controlador_principal = controlador_principal
-        self.__tela_pagamento = TelaPagamento(self)
+        self.__tela_pagamento = TelaPagamentoGUI(self)
         self.__pagamento_dao = PagamentoDAO()
 
     def iniciar(self) -> None:
@@ -31,94 +31,15 @@ class ControladorPagamento:
     def pegar_atendimentos(self) -> list:
         return self.__controlador_principal.controlador_atendimento.atendimentos
 
-    def listar_atendimentos_para_pagamento(self) -> None:
-        atendimentos = self.pegar_atendimentos()
-
-        if len(atendimentos) == 0:
-            self.__tela_pagamento.mostrar_msg("Nenhum atendimento cadastrado.")
-            return
-
-        for indice, atendimento in enumerate(atendimentos):
-            dados_atendimento = {
-                "indice": indice,
-                "paciente": atendimento.paciente.nome,
-                "profissional": atendimento.profissional.nome,
-                "clinica": atendimento.clinica.nome,
-                "data": atendimento.data,
-                "horario_inicio": atendimento.horario_inicio,
-                "horario_fim": atendimento.horario_fim,
-                "valor_restante": atendimento.calcular_valor_restante(),
-            }
-
-            self.__tela_pagamento.mostrar_atendimento_resumo(dados_atendimento)
-
     def selecionar_atendimento(self):
         atendimentos = self.pegar_atendimentos()
 
         if len(atendimentos) == 0:
-            self.__tela_pagamento.mostrar_msg("Nenhum atendimento cadastrado.")
+            self.__tela_pagamento.mostrar_mensagem("Nenhum atendimento cadastrado.")
             return None
 
-        self.listar_atendimentos_para_pagamento()
+        return self.__controlador_principal.controlador_atendimento.selecionar_atendimento
 
-        indice = self.__tela_pagamento.selecionar_atendimento()
-
-        if indice < 0 or indice >= len(atendimentos):
-            self.__tela_pagamento.mostrar_msg("Atendimento inválido.")
-            return None
-
-        return atendimentos[indice]
-
-    def criar_pagamento_para_atendimento(self, atendimento):
-        dados_pagamento = self.__tela_pagamento.pegar_dados()
-
-        if dados_pagamento["data"] > atendimento.data:
-            self.__tela_pagamento.mostrar_msg(
-                "ERRO: O pagamento deve ser realizado até a data do atendimento."
-            )
-            return None
-
-        if dados_pagamento["valor_pago"] > atendimento.calcular_valor_restante():
-            self.__tela_pagamento.mostrar_msg(
-                "ERRO: O valor pago não pode ser maior que o valor restante."
-            )
-            return None
-
-        codigo_novo = self.__gerar_codigo()
-        modalidade = self.__tela_pagamento.mostrar_menu_modalidade()
-
-        if modalidade == 1:
-            pagamento = Dinheiro(
-                codigo_novo,
-                dados_pagamento["data"],
-                dados_pagamento["valor_pago"],
-                atendimento,
-            )
-
-        elif modalidade == 2:
-            dados_pix = self.__tela_pagamento.pegar_dados_pix()
-
-            pagamento = Pix(
-                codigo_novo,
-                dados_pagamento["data"],
-                dados_pagamento["valor_pago"],
-                dados_pix["cpf_pagador"],
-                atendimento,
-            )
-
-        else:
-            dados_cartao = self.__tela_pagamento.pegar_dados_cartao()
-
-            pagamento = Cartao(
-                codigo_novo,
-                dados_pagamento["data"],
-                dados_pagamento["valor_pago"],
-                dados_cartao["numero_cartao"],
-                dados_cartao["bandeira"],
-                atendimento,
-            )
-
-        return pagamento
 
     def remover_pagamento_do_atendimento(self, atendimento) -> None:
         pagamentos_para_remover = []
@@ -135,6 +56,71 @@ class ControladorPagamento:
 
         if atendimento is None:
             return
+        
+        dados_pagamento = self.__tela_pagamento.abrir_janela_cadastro()
+
+        if dados_pagamento is None:
+            return
+        
+        if dados_pagamento["data"] > atendimento.data:
+            self.__tela_pagamento.mostrar_mensagem(
+                "ERRO: O pagamento deve ser realizado até a data do atendimento"
+            )
+            return
+
+        if dados_pagamento["valor_pago"] > atendimento.calcular_valor_restante():
+            self.__tela_pagamento.mostrar_mensagem(
+                "ERRO: O valor pago não pode ser maior que o valor restante."
+            )  
+            return
+        
+        codigo_novo = self.__gerar_codigo()
+        modalidade = dados_pagamento["modalidade"]
+        pagamento = None
+
+        if modalidade == "Dinheiro":
+            pagamento = Dinheiro(
+                codigo_novo,
+                dados_pagamento["data"],
+                dados_pagamento["valor_pago"],
+                atendimento,
+            )
+        
+        elif modalidade == "PIX":
+            dados_pix = self.__tela_pagamento.pegar_dados_pix
+
+            if dados_pix is None:
+                return
+            
+            pagamento = Pix(
+                codigo_novo,
+                dados_pagamento["data"],
+                dados_pagamento["valor_pago"],
+                dados_pix["cpf_pagador"],
+                atendimento,
+            )
+        
+        elif modalidade == "Cartão de crédito":
+            dados_cartao = self.__tela_pagamento.pegar_dados_cartao()
+
+            if dados_cartao is None:
+                return
+            
+            pagamento = Cartao(
+                codigo_novo,
+                dados_pagamento["data"],
+                dados_pagamento["valor_pago"],
+                dados_cartao["numero_cartao"],
+                dados_cartao["bandeira"],
+                atendimento,
+            )
+        
+        if pagamento is not None:
+            pagamento.processar_pagamento()
+            atendimento.add_pagamentos(pagamento)
+            self.__pagamento_dao.add(pagamento)
+
+            self.__tela_pagamento.mostrar_mensagem("Pagamento cadastrado com sucesso!")
 
         pagamento = self.criar_pagamento_para_atendimento(atendimento)
 
@@ -146,23 +132,16 @@ class ControladorPagamento:
         atendimento.add_pagamentos(pagamento)
         self.__pagamento_dao.add(pagamento)
 
-        self.__tela_pagamento.mostrar_msg("Pagamento cadastrado com sucesso.")
+        self.__tela_pagamento.mostrar_mensagem("Pagamento cadastrado com sucesso.")
 
     def listar_pagamentos(self) -> None:
-        if len(self.__pagamento_dao.get_all()) == 0:
-            self.__tela_pagamento.mostrar_msg("Nenhum pagamento cadastrado.")
+        pagamentos = self.__pagamento_dao.get_all()
+
+        if len(pagamentos) == 0:
+            self.__tela_pagamento.mostrar_mensagem("Nenhum pagamento cadastrado.")
             return
-
-        for pagamento in self.__pagamento_dao.get_all():
-            dados_pagamento = {
-                "codigo": pagamento.codigo,
-                "modalidade": self.identificar_modalidade(pagamento),
-                "data": pagamento.data,
-                "valor_pago": pagamento.valor_pago,
-                "paciente": pagamento.paciente.nome,
-            }
-
-            self.__tela_pagamento.mostrar_pagamento(dados_pagamento)
+        
+        self.__tela_pagamento.tabela_pagamentos(pagamentos)
 
     def pegar_pagamento_por_codigo(self, codigo: int) -> Pagamento | None:
         return self.__pagamento_dao.get(codigo)
@@ -181,22 +160,36 @@ class ControladorPagamento:
 
     def alterar_pagamento(self) -> None:
         if len(self.__pagamento_dao.get_all()) == 0:
-            self.__tela_pagamento.mostrar_msg("Nenhum pagamento cadastrado.")
+            self.__tela_pagamento.mostrar_mensagem("Nenhum pagamento cadastrado.")
             return
 
-        self.listar_pagamentos()
-
-        codigo = self.__tela_pagamento.selecionar_pagamento()
+        codigo = self.__tela_pagamento.tabela_pagamentos(
+            self.__pagamento_dao.get_all(),
+            selecionar=True
+        )
+        
+        if codigo is None:
+            return
+        
         pagamento = self.pegar_pagamento_por_codigo(codigo)
 
         if pagamento is None:
-            self.__tela_pagamento.mostrar_msg("Pagamento não encontrado.")
+            self.__tela_pagamento.mostrar_mensagem("Pagamento não encontrado.")
+            return
+        
+        dados_antigos = {
+            "data": pagamento.data,
+            "valor_pago": pagamento.valor_pago,
+            "modalidade": self.identificar_modalidade(pagamento)
+        }
+
+        novos_dados = self.__tela_pagamento.abrir_janela_cadastro(dados_antigos)
+
+        if novos_dados is None:
             return
 
-        dados_pagamento = self.__tela_pagamento.pegar_dados()
-
-        if dados_pagamento["data"] > pagamento.atendimento.data:
-            self.__tela_pagamento.mostrar_msg(
+        if novos_dados["data"] > pagamento.atendimento.data:
+            self.__tela_pagamento.mostrar_mensagem(
                 "ERRO: O pagamento deve ser realizado até a data do atendimento."
             )
             return
@@ -205,39 +198,50 @@ class ControladorPagamento:
             pagamento.valor_pago + pagamento.atendimento.calcular_valor_restante()
         )
 
-        if dados_pagamento["valor_pago"] > valor_maximo_permitido:
-            self.__tela_pagamento.mostrar_msg(
+        if novos_dados["valor_pago"] > valor_maximo_permitido:
+            self.__tela_pagamento.mostrar_mensagem(
                 "ERRO: O novo valor pago ultrapassa o valor restante."
             )
             return
+        
+        if novos_dados["modalidade"] != self.identificar_modalidade(pagamento):
+            self.__tela_pagamento.mostrar_mensagem("Para trocar de modalidade, exclua este pagamento e crie um novo.")
+            return
 
-        pagamento.data = dados_pagamento["data"]
-        pagamento.valor_pago = dados_pagamento["valor_pago"]
+        pagamento.data = novos_dados["data"]
+        pagamento.valor_pago = novos_dados["valor_pago"]
 
         if isinstance(pagamento, Pix):
             dados_pix = self.__tela_pagamento.pegar_dados_pix()
+            if dados_pix is None: return
             pagamento.cpf_pagador = dados_pix["cpf_pagador"]
 
         elif isinstance(pagamento, Cartao):
             dados_cartao = self.__tela_pagamento.pegar_dados_cartao()
+            if dados_cartao is None: return
             pagamento.numero_cartao = dados_cartao["numero_cartao"]
             pagamento.bandeira = dados_cartao["bandeira"]
 
         self.__pagamento_dao.update(pagamento)
-        self.__tela_pagamento.mostrar_msg("Pagamento alterado com sucesso.")
+        self.__tela_pagamento.mostrar_mensagem("Pagamento alterado com sucesso.")
 
     def excluir_pagamento(self) -> None:
         if len(self.__pagamento_dao.get_all()) == 0:
-            self.__tela_pagamento.mostrar_msg("Nenhum pagamento cadastrado.")
+            self.__tela_pagamento.mostrar_mensagem("Nenhum pagamento cadastrado.")
             return
 
-        self.listar_pagamentos()
+        codigo = self.__tela_pagamento.tabela_pagamentos(
+            self.__pagamento_dao.get_all(),
+            selecionar=True
+        )
 
-        codigo = self.__tela_pagamento.selecionar_pagamento()
+        if codigo is None:
+            return
+        
         pagamento = self.pegar_pagamento_por_codigo(codigo)
 
         if pagamento is None:
-            self.__tela_pagamento.mostrar_msg("Pagamento não encontrado.")
+            self.__tela_pagamento.mostrar_mensagem("Pagamento não encontrado.")
             return
 
         self.__pagamento_dao.remove(codigo)
@@ -245,28 +249,22 @@ class ControladorPagamento:
         if pagamento in pagamento.atendimento.pagamentos:
             pagamento.atendimento.pagamentos.remove(pagamento)
 
-        self.__tela_pagamento.mostrar_msg("Pagamento removido com sucesso.")
+        self.__tela_pagamento.mostrar_mensagem("Pagamento removido com sucesso.")
 
     def abrir_tela(self) -> None:
-        lista_opcoes = {
-            1: self.incluir_pagamento,
-            2: self.alterar_pagamento,
-            3: self.excluir_pagamento,
-            4: self.listar_pagamentos,
-            0: self.voltar,
-        }
+        while True:
+            opcao = self.__tela_pagamento.mostrar_menu()
 
-        continua = True
-
-        while continua:
-            opcao_escolhida = self.__tela_pagamento.mostrar_menu()
-
-            funcao_escolhida = lista_opcoes[opcao_escolhida]
-
-            if opcao_escolhida == 0:
-                continua = False
-
-            funcao_escolhida()
+            if opcao == "Incluir Pagamento":
+                self.incluir_pagamento()
+            elif opcao == "Alterar Pagamento":
+                self.alterar_pagamento()
+            elif opcao == "Excluir Pagamento":
+                self.excluir_pagamento()
+            elif opcao == "Listar Pagamentos":
+                self.listar_pagamentos()
+            elif opcao == "Voltar":
+                break
 
     def voltar(self) -> None:
         return
