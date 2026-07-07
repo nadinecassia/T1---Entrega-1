@@ -1,12 +1,12 @@
 from entidade.procedimento import Procedimento
-from limite.TelaProcedimento import TelaProcedimento
+from limite_gui.TelaProcedimentoGUI import TelaProcedimentoGUI
 from dao.ProcedimentoDAO import ProcedimentoDAO
 
 class ControladorProcedimento:
     def __init__(self, controlador_principal):
         self.__controlador_principal = controlador_principal
         self.__procedimento_dao = ProcedimentoDAO()
-        self.__tela_procedimento = TelaProcedimento(self)
+        self.__tela_procedimento = TelaProcedimentoGUI(self)
 
     def iniciar(self):
         self.abrir_tela()
@@ -44,6 +44,9 @@ class ControladorProcedimento:
     def incluir_procedimento(self):
         dados_procedimento = self.__tela_procedimento.pegar_dados()
 
+        if dados_procedimento is None:
+            return
+
         if self.__procedimento_dao.get(dados_procedimento["descricao"]) is not None:
             self.__tela_procedimento.mostrar_msg("Já existe um procedimento com essa descrição!")
             return
@@ -69,6 +72,10 @@ class ControladorProcedimento:
 
     def alterar_procedimento(self):
         nome_busca = self.__tela_procedimento.selecionar()
+
+        if nome_busca is None:
+            return
+
         procedimento = self.__procedimento_dao.get(nome_busca)
 
         if procedimento is None:
@@ -88,6 +95,9 @@ class ControladorProcedimento:
 
     def excluir_procedimento(self):
         nome_busca = self.__tela_procedimento.selecionar()
+
+        if nome_busca is None:
+            return
         
         if self.__procedimento_dao.get(nome_busca) is not None:
             self.__procedimento_dao.remove(nome_busca)
@@ -108,21 +118,22 @@ class ControladorProcedimento:
                 "profissional_nome": p.profissional.nome
             })
 
-    def abrir_tela(self):
-        lista_opcoes = {
-            1: self.incluir_procedimento,
-            2: self.alterar_procedimento,
-            3: self.excluir_procedimento,
-            4: self.listar_procedimentos,
-            0: self.voltar
-        }
-
+    def abrir_tela(self) -> None:
         while True:
-            opcao_escolhida = self.__tela_procedimento.mostrar_menu()
-            if opcao_escolhida in lista_opcoes:
-                funcao_escolhida = lista_opcoes[opcao_escolhida]
-                funcao_escolhida()
-            if opcao_escolhida == 0:
+            opcao = self.__tela_procedimento.mostrar_menu()
+            if opcao == "Incluir Procedimento":
+                self.incluir_procedimento()
+            
+            elif opcao == "Alterar Procedimento":
+                self.alterar_procedimento()
+            
+            elif opcao == "Excluir Procedimento":
+                self.excluir_procedimento()
+
+            elif opcao == "Listar Procedimentos":
+                self.listar_procedimentos()
+            
+            elif opcao == 0:
                 break
 
     def voltar(self):
