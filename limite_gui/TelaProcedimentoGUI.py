@@ -14,7 +14,7 @@ class TelaProcedimentoGUI(AbstractTelaGUI):
             [sg.Button('Alterar Procedimento', size=(25, 2))],
             [sg.Button('Excluir Procedimento', size=(25, 2))],
             [sg.Button('Listar Procedimentos', size=(25, 2))],
-            [sg.Button('Voltar', key=0, size=(25, 1))]
+            [sg.Button('Voltar', size=(25, 1))]
         ]
 
         window = sg.Window(
@@ -25,13 +25,14 @@ class TelaProcedimentoGUI(AbstractTelaGUI):
             finalize=True
         )
         
-        button, values = window.read()
+        evento, valores = window.read()
+
         window.close()
 
-        if button is None:
-            return 0
+        if evento in (sg.WIN_CLOSED, "Voltar"):
+            return "Voltar"
             
-        return button
+        return evento
 
     def pegar_dados(self) -> dict:
         layout = [
@@ -60,6 +61,37 @@ class TelaProcedimentoGUI(AbstractTelaGUI):
                 window.close()
                 return {"descricao": descricao, "custo": custo}
 
+    def tabela_procedimentos(self, procedimentos, selecionar=False):
+        dados = [[p.descricao, f"R$ {p.custo:.2f}", p.profissional.nome] for p in procedimentos]
+
+        layout = [
+            [sg.Table(values=dados,
+                      headings=["Descrição", "Custo", "Profissional"],
+                      key="tabela", auto_size_columns=True, justification="left",
+                      expand_x=True, expand_y=True, enable_events=True,
+                      select_mode=sg.TABLE_SELECT_MODE_BROWSE)]
+        ]
+
+        if selecionar:
+            layout.append([sg.Button("Selecionar"), sg.Button("Cancelar")])
+        else:
+            layout.append([sg.Button("Fechar")])
+
+        window = sg.Window("Procedimentos Cadastrados", layout, size=(700, 400))
+        
+        while True:
+            evento, valores = window.read()
+            if evento in (sg.WIN_CLOSED, "Fechar", "Cancelar"):
+                window.close()
+                return None
+            if evento == "Selecionar":
+                if not valores["tabela"]:
+                    self.mostrar_mensagem("Selecione um procedimento.")
+                    continue
+                indice = valores["tabela"][0]
+                window.close()
+                return procedimentos[indice].descricao
+
     def mostrar_procedimento(self, dados_procedimento: dict):
         mensagem = (
             f"PROCEDIMENTO: {dados_procedimento['descricao']}\n"
@@ -68,29 +100,5 @@ class TelaProcedimentoGUI(AbstractTelaGUI):
         )
         sg.popup(mensagem, title="Detalhes do Procedimento")
 
-    def selecionar(self) -> str:
-        while True:
-            texto = sg.popup_get_text("Digite a descrição exata do procedimento:", title="Selecionar Procedimento")
-            if texto is None:
-                return None
-            
-            texto_validado = self.validar_texto(texto)
-            if texto_validado:
-                return texto_validado
-
     def mostrar_msg(self, msg: str):
         self.mostrar_mensagem(msg)
-
-    def mostrar_lista(self, procedimentos):
-        texto = "--- PROCEDIMENTOS DISPONÍVEIS ---\n\n"
-        for p in procedimentos:
-            texto += f"-> {p.descricao} (R$ {p.custo:.2f})\n"
-        
-        sg.popup_scrolled(texto, title="Lista de Procedimentos", size=(40, 10))
-
-    def selecionar_procedimento(self):
-        return self.selecionar()
-
-    def selecionar_procedimento_para_remover(self, procedimentos):
-        self.mostrar_lista(procedimentos)
-        return self.selecionar()

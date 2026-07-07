@@ -10,22 +10,26 @@ class TelaRelatorioGUI(AbstractTelaGUI):
         layout = [
             [sg.Text('Relatórios Estatísticos', font=("Arial", 18, "bold"), justification="center", expand_x=True)],
             [sg.HorizontalSeparator()],
-            [sg.Button('Clínicas com Maior Número de Atendimentos', key=1, size=(45, 2))],
-            [sg.Button('Atendimentos Mais Caros e Mais Baratos', key=2, size=(45, 2))],
-            [sg.Button('Procedimentos Mais Realizados (Populares)', key=3, size=(45, 2))],
-            [sg.Button('Procedimentos Mais Caros e Mais Baratos', key=4, size=(45, 2))],
-            [sg.Button('Voltar', key=0, size=(45, 1))]
+            [sg.Button('Clínicas com Maior Número de Atendimentos', size=(45, 2))],
+            [sg.Button('Atendimentos Mais Caros e Mais Baratos', size=(45, 2))],
+            [sg.Button('Procedimentos Mais Realizados (Populares)', size=(45, 2))],
+            [sg.Button('Procedimentos Mais Caros e Mais Baratos', size=(45, 2))],
+            [sg.Button('Voltar', size=(45, 1))]
         ]
 
-        window = sg.Window('Sistema - Relatórios', layout, size=(500, 380), element_justification="center")
+        window = sg.Window(
+            'Sistema de Relatórios', 
+            layout, size=(500, 380),
+            element_justification="center")
         
-        button, values = window.read()
+        evento, valores = window.read()
+
         window.close()
 
-        if button is None:
-            return 0
+        if evento in (sg.WIN_CLOSED, "Voltar"):
+            return "Voltar"
             
-        return button
+        return evento
 
     def mostrar_msg(self, msg: str):
         self.mostrar_mensagem(msg)

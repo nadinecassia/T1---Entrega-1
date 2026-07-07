@@ -54,71 +54,65 @@ class ControladorTipoAtendimento:
         self.__tela_tipo_atendimento.mostrar_msg("Tipo de atendimento cadastrado com sucesso!")
 
     def alterar_tipo_atendimento(self) -> None:
-        self.listar_tipos_atendimento()
-        nome = self.__tela_tipo_atendimento.selecionar()
-
-        if nome is None:
+        tipos = self.__tipo_atendimento_dao.get_all()
+        if not tipos:
+            self.__tela_tipo_atendimento.mostrar_mensagem("Nenhum tipo cadastrado.")
             return
 
-        tipo = self.pegar_tipo_por_nome(nome)
-
-        if tipo is None:
-            self.__tela_tipo_atendimento.mostrar_msg("Tipo de atendimento não encontrado.")
+        codigo_busca = self.__tela_tipo_atendimento.tabela_tipos(tipos, selecionar=True)
+        if codigo_busca is None:
             return
+        
+        tipo = self.__tipo_atendimento_dao.get(codigo_busca)
         
         novos_dados = self.__tela_tipo_atendimento.pegar_dados()
-
         if novos_dados is None:
             return
-        
+            
         tipo.nome = novos_dados["nome"]
         tipo.descricao = novos_dados["descricao"]
         
         self.__tipo_atendimento_dao.update(tipo)
-        self.__tela_tipo_atendimento.mostrar_msg("Tipo de atendimento alterado com sucesso.")
+        self.__tela_tipo_atendimento.mostrar_mensagem("Tipo de atendimento alterado!")
     
     def excluir_tipo_atendimento(self) -> None:
-        self.listar_tipos_atendimento()
-        nome = self.__tela_tipo_atendimento.selecionar()
-
-        if nome is None:
+        tipos = self.__tipo_atendimento_dao.get_all()
+        if not tipos:
+            self.__tela_tipo_atendimento.mostrar_mensagem("Nenhum tipo cadastrado.")
             return
 
-        tipo = self.pegar_tipo_por_nome(nome)
-
-        if tipo is None:
-            self.__tela_tipo_atendimento.mostrar_msg("Tipo de atendimento não encontrado.")
+        codigo_busca = self.__tela_tipo_atendimento.tabela_tipos(tipos, selecionar=True)
+        if codigo_busca is None:
             return
         
-        self.__tipo_atendimento_dao.remove(tipo.codigo)
-        self.__tela_tipo_atendimento.mostrar_msg("Tipo de atendimento excluído com sucesso.")
+        self.__tipo_atendimento_dao.remove(codigo_busca)
+        self.__tela_tipo_atendimento.mostrar_mensagem("Tipo de atendimento excluído!")
     
     def listar_tipos_atendimento(self) -> None:
-        if len(self.__tipo_atendimento_dao.get_all()) == 0:
-            self.__tela_tipo_atendimento.mostrar_msg("Nenhum tipo de atendimento cadastrado.")
+        tipos = self.__tipo_atendimento_dao.get_all()
+        if not tipos:
+            self.__tela_tipo_atendimento.mostrar_mensagem("Nenhum tipo cadastrado.")
             return
-        
-        for tipo in self.__tipo_atendimento_dao.get_all():
-            dados_tipo = {"nome": tipo.nome, "descricao": tipo.descricao}
-            self.__tela_tipo_atendimento.mostrar_tipo_atendimento(dados_tipo)
+
+        self.__tela_tipo_atendimento.tabela_tipos(tipos, selecionar=False)
 
     def abrir_tela(self) -> None:
-        lista_opcoes = {
-            1: self.incluir_tipo,
-            2: self.alterar_tipo_atendimento,
-            3: self.excluir_tipo_atendimento,
-            4: self.listar_tipos_atendimento,
-            0: self.voltar
-        }
-
         while True:
-            opcao_escolhida = self.__tela_tipo_atendimento.mostrar_menu()
+            opcao = self.__tela_tipo_atendimento.mostrar_menu()
+            if opcao == "Incluir Tipo":
+                self.incluir_tipo()
             
-            if opcao_escolhida == 0:
+            elif opcao == "Alterar Tipo":
+                self.alterar_tipo_atendimento()
+            
+            elif opcao == "Excluir Tipo":
+                self.excluir_tipo_atendimento()
+
+            elif opcao == "Listar Tipos":
+                self.listar_tipos_atendimento()
+            
+            elif opcao == "Voltar":
                 break
-                
-            funcao_escolhida = lista_opcoes[opcao_escolhida]
-            funcao_escolhida()
     
     def voltar(self) -> None:
         return

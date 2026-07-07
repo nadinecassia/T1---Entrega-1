@@ -19,7 +19,7 @@ class TelaClinicaGUI(AbstractTelaGUI):
             [sg.Button('Alterar Clínica', size=(25, 2))],
             [sg.Button('Excluir Clínica', size=(25, 2))],
             [sg.Button('Listar Clínicas', size=(25, 2))],
-            [sg.Button('Voltar', key=0, size=(25, 1))]
+            [sg.Button('Voltar', size=(25, 1))]
         ]
 
         window = sg.Window(
@@ -30,13 +30,14 @@ class TelaClinicaGUI(AbstractTelaGUI):
             finalize=True
         )
         
-        button, values = window.read()
+        evento, valores = window.read()
+
         window.close()
 
-        if button is None or button == 0:
-            return 0
+        if evento in (sg.WIN_CLOSED, "Voltar"):
+            return "Voltar"
             
-        return button
+        return evento
 
     def pegar_dados(self) -> dict:
         layout = [
@@ -75,29 +76,47 @@ class TelaClinicaGUI(AbstractTelaGUI):
                     "horario_fechado": horario_fechado,
                 }
 
-    def mostrar_clinica(self, dados_clinica: dict):
-        mensagem = (
-            f"NOME DA CLÍNICA: {dados_clinica['nome']}\n"
-            f"DESCRIÇÃO: {dados_clinica['descricao']}\n"
-            f"CIDADE: {dados_clinica['cidade']}\n"
-            f"HORÁRIO DE ABERTURA: {dados_clinica['horario_aberto'].strftime('%H:%M')}\n"
-            f"HORÁRIO DE FECHAMENTO: {dados_clinica['horario_fechado'].strftime('%H:%M')}"
-        )
-        sg.popup(mensagem, title="Detalhes da Clínica")
+    def tabela_clinicas(self, clinicas, selecionar=False):
+        # Transforma a lista de objetos Clinica em uma lista de listas para a tabela
+        dados = []
+        for c in clinicas:
+            dados.append([c.nome, c.descricao, c.cidade, 
+                          c.horario_aberto.strftime("%H:%M"), 
+                          c.horario_fechado.strftime("%H:%M")])
 
-    def le_texto_obrigatorio(self, mensagem: str):
+        layout = [
+            [sg.Table(values=dados,
+                      headings=["Nome", "Descrição", "Cidade", "Abertura", "Fechamento"],
+                      key="tabela",
+                      auto_size_columns=True,
+                      justification="left",
+                      expand_x=True,
+                      expand_y=True,
+                      enable_events=True,
+                      select_mode=sg.TABLE_SELECT_MODE_BROWSE)]
+        ]
+
+        if selecionar:
+            layout.append([sg.Button("Selecionar"), sg.Button("Cancelar")])
+        else:
+            layout.append([sg.Button("Fechar")])
+
+        window = sg.Window("Clínicas Cadastradas", layout, size=(700, 400))
+
         while True:
-            texto = sg.popup_get_text(mensagem, title="Entrada de Dados")
-
-            if texto is None:
+            evento, valores = window.read()
+            if evento in (sg.WIN_CLOSED, "Fechar", "Cancelar"):
+                window.close()
                 return None
+
+            if evento == "Selecionar":
+                if len(valores["tabela"]) == 0:
+                    self.mostrar_mensagem("Selecione uma clínica.")
+                    continue
                 
-            texto_validado = self.validar_texto(texto)
-            if texto_validado:
-                return texto_validado
+                indice = valores["tabela"][0]
+                window.close()
+                return clinicas[indice].nome
 
     def mostrar_msg(self, msg: str):
         self.mostrar_mensagem(msg)
-
-    def selecionar(self):
-        return self.le_texto_obrigatorio("Digite o nome exato da clínica que deseja selecionar: ")

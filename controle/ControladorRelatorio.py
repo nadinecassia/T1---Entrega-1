@@ -142,20 +142,21 @@ class ControladorRelatorio:
         )
 
     def abrir_tela(self):
-        lista_opcoes = {
-            1: self.clinicas_com_mais_atendimentos,
-            2: self.atendimentos_mais_caros_e_mais_baratos,
-            3: self.procedimentos_mais_realizados,
-            4: self.procedimentos_mais_caros_e_mais_baratos,
-            0: self.voltar
-        }
-
         while True:
-            opcao_escolhida = self.__tela_relatorio.mostrar_menu()
-            if opcao_escolhida in lista_opcoes:
-                funcao_escolhida = lista_opcoes[opcao_escolhida]
-                funcao_escolhida()
-            if opcao_escolhida == 0:
+            opcao = self.__tela_relatorio.mostrar_menu()
+            if opcao == "Clínicas com Maior Número de Atendimentos":
+                self.clinicas_com_mais_atendimentos
+
+            elif opcao == "Atendimentos Mais Caros e Mais Baratos":
+                self.atendimentos_mais_caros_e_mais_baratos
+            
+            elif opcao == "Procedimentos Mais Realizados (Populares)":
+                self.procedimentos_mais_realizados
+            
+            elif opcao == "Procedimentos Mais Caros e Mais Baratos":
+                self.procedimentos_mais_caros_e_mais_baratos
+            
+            elif opcao == "Voltar":
                 break
 
     def voltar(self):
