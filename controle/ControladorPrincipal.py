@@ -1,4 +1,4 @@
-from limite.TelaPrincipal import TelaPrincipal
+from limite_gui.TelaPrincipalGUI import TelaPrincipalGUI
 
 from controle.ControladorAtendimento import ControladorAtendimento
 from controle.ControladorClinica import ControladorClinica
@@ -12,7 +12,7 @@ from controle.ControladorTipoAtendimento import ControladorTipoAtendimento
 
 class ControladorPrincipal:
     def __init__(self) -> None:
-        self.__tela_principal = TelaPrincipal(self)
+        self.__tela_principal = TelaPrincipalGUI()
 
         self.__controlador_clinica = ControladorClinica(self)
         self.__controlador_paciente = ControladorPaciente(self)
@@ -56,7 +56,37 @@ class ControladorPrincipal:
         return self.__controlador_relatorio
 
     def iniciar(self) -> None:
-        self.abrir_tela()
+        while True:
+            evento = self.__tela_principal.mostrar_menu()
+
+            if evento == "Pacientes":
+                self.__controlador_paciente.iniciar()
+
+            elif evento == "Profissionais":
+                self.__controlador_profissional.iniciar()
+            
+            elif evento == "Clínicas":
+                self.__controlador_clinica.iniciar()
+            
+            elif evento == "Tipos de Atendimento":
+                self.__controlador_tipo_atendimento.iniciar()
+            
+            elif evento == "Procedimentos":
+                self.__controlador_procedimento.iniciar()
+            
+            elif evento == "Atendimentos":
+                self.__controlador_atendimento.iniciar()
+            
+            elif evento == "Pagamentos":
+                self.__controlador_pagamento.iniciar()
+            
+            elif evento == "Relatórios":
+                self.__controlador_relatorio.iniciar()
+            
+            elif evento in ("Sair", None):
+                break
+        
+        self.__tela_principal.fechar()
 
     def abrir_tela(self) -> None:
         lista_opcoes = {
