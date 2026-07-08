@@ -39,48 +39,42 @@ class ControladorAtendimento:
 
         return atendimento
 
-    def incluir_atendimento(self):
-        clinica = self.__controlador_principal.controlador_clinica.selecionar_clinica_por_tabela()
-        if clinica is None: 
-            return 
-
-        paciente = self.__controlador_principal.controlador_paciente.selecionar_paciente_para_atendimento()
-        if paciente is None:
+    def listar_atendimentos(self):
+        atendimentos = self.__atendimento_dao.get_all()
+        if not atendimentos:
+            self.__tela_atendimento.mostrar_mensagem("Nenhum atendimento agendado!")
             return
 
-        profissional = self.__controlador_principal.controlador_profissional.selecionar_profissional_para_atendimento()
-        if profissional is None:
+        busca = self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=True)
+
+        if busca is None:
             return
 
-        tipo_atendimento = self.__controlador_principal.controlador_tipo_atendimento.selecionar_tipo_por_tabela()
-        if tipo_atendimento is None:
+        cpf_busca, data_busca = busca
+        atendimento = self.__atendimento_dao.get(cpf_busca, data_busca)
+
+        if atendimento is None:
+            self.__tela_atendimento.mostrar_mensagem("Erro: Atendimento não localizado.")
             return
 
-        dados_tela = self.__tela_atendimento.abrir_janela_cadastro()
-        if dados_tela is None: 
-            return
+        dados_detalhados = {
+            "clinica_nome": atendimento.clinica.nome,
+            "clinica_cidade": atendimento.clinica.cidade,
+            "paciente_nome": atendimento.paciente.nome,
+            "paciente_cpf": atendimento.paciente.cpf,
+            "profissional_nome": atendimento.profissional.nome,
+            "profissional_registro": atendimento.profissional.registro_profissional,
+            "data": atendimento.data,
+            "horario_inicio": atendimento.horario_inicio,
+            "horario_fim": atendimento.horario_fim,
+            "tipo_atendimento_nome": atendimento.tipo_atendimento.nome,
+            "valor": atendimento.valor,
+            "custo_procedimentos": atendimento.calcular_custo_total_procedimentos(),
+            "valor_restante": atendimento.valor + atendimento.calcular_custo_total_procedimentos(), 
+            "procedimentos": [{"descricao": p.descricao, "custo": p.custo} for p in atendimento.procedimentos]
+        }
 
-        if paciente.calcular_idade() < 18:
-            self.__tela_atendimento.mostrar_mensagem(f"O paciente {paciente.nome} tem {paciente.calcular_idade()} anos. Somente maiores de 18 anos podem realizar atendimentos de forma independente!")
-            return
-
-        if not clinica.esta_aberta(dados_tela["hora_inicio"], dados_tela["hora_fim"]):
-            self.__tela_atendimento.mostrar_mensagem(f"REJEITADO: Horário fora do funcionamento da clínica!")
-            return
-
-        novo_atendimento = Atendimento(
-            data=dados_tela["data"],
-            horario_inicio=dados_tela["hora_inicio"],
-            horario_fim=dados_tela["hora_fim"],
-            tipo_atendimento=tipo_atendimento,
-            valor=dados_tela["valor"],
-            clinica=clinica,
-            paciente=paciente,
-            profissional=profissional,
-        )
-
-        self.__atendimento_dao.add(novo_atendimento)
-        self.__tela_atendimento.mostrar_mensagem("Atendimento agendado com sucesso!")
+        self.__tela_atendimento.mostrar_atendimento(dados_detalhados)
 
     def alterar_atendimento(self):
         atendimentos = self.__atendimento_dao.get_all()
@@ -142,14 +136,6 @@ class ControladorAtendimento:
         atendimento.add_procedimento(procedimento)
         self.__atendimento_dao.update(atendimento)
         self.__tela_atendimento.mostrar_mensagem(f"Procedimento '{procedimento.descricao}' adicionado!")
-
-    def listar_atendimentos(self):
-        atendimentos = self.__atendimento_dao.get_all()
-        if not atendimentos:
-            self.__tela_atendimento.mostrar_mensagem("Nenhum atendimento agendado!")
-            return
-
-        self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=False)
 
     def excluir_atendimento(self):
         atendimentos = self.__atendimento_dao.get_all()
