@@ -64,8 +64,7 @@ class ControladorClinica:
         if dados_novos is None:
             return
 
-        if dados_novos["nome"] != nome_busca:
-            self.__clinica_dao.remove(nome_busca)
+        self.__clinica_dao.remove(nome_busca)
 
         clinica.nome = dados_novos["nome"]
         clinica.descricao = dados_novos["descricao"]
@@ -73,7 +72,8 @@ class ControladorClinica:
         clinica.horario_aberto = dados_novos["horario_aberto"]
         clinica.horario_fechado = dados_novos["horario_fechado"]
 
-        self.__clinica_dao.update(clinica)
+        self.__clinica_dao.add(clinica)
+
         self.__tela_clinica.mostrar_mensagem("Clínica alterada com sucesso!")
 
     def excluir_clinica(self):

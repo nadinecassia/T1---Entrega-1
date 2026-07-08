@@ -145,16 +145,16 @@ class ControladorRelatorio:
         while True:
             opcao = self.__tela_relatorio.mostrar_menu()
             if opcao == "Clínicas com Maior Número de Atendimentos":
-                self.clinicas_com_mais_atendimentos
+                self.clinicas_com_mais_atendimentos()
 
             elif opcao == "Atendimentos Mais Caros e Mais Baratos":
-                self.atendimentos_mais_caros_e_mais_baratos
+                self.atendimentos_mais_caros_e_mais_baratos()
             
             elif opcao == "Procedimentos Mais Realizados (Populares)":
-                self.procedimentos_mais_realizados
+                self.procedimentos_mais_realizados()
             
             elif opcao == "Procedimentos Mais Caros e Mais Baratos":
-                self.procedimentos_mais_caros_e_mais_baratos
+                self.procedimentos_mais_caros_e_mais_baratos()
             
             elif opcao == "Voltar":
                 break
