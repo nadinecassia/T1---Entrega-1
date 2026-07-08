@@ -18,6 +18,27 @@ class ControladorAtendimento:
     def iniciar(self):
         self.abrir_tela()
 
+    def selecionar_atendimento(self):
+        atendimentos = self.__atendimento_dao.get_all()
+
+        if not atendimentos:
+            self.__tela_atendimento.mostrar_msg("Nenhum atendimento cadastrado.")
+            return None
+
+        busca = self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=True)
+
+        if busca is None:
+            return None
+
+        cpf_busca, data_busca = busca
+        atendimento = self.__atendimento_dao.get(cpf_busca, data_busca)
+
+        if atendimento is None:
+            self.__tela_atendimento.mostrar_msg("Erro: Atendimento não encontrado.")
+            return None
+
+        return atendimento
+
     def incluir_atendimento(self):
         clinica = self.__controlador_principal.controlador_clinica.selecionar_clinica_por_tabela()
         if clinica is None: 
