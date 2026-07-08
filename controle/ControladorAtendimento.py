@@ -125,24 +125,7 @@ class ControladorAtendimento:
             self.__tela_atendimento.mostrar_msg("Nenhum atendimento agendado!")
             return
 
-        for a in atendimentos:
-            dados = {
-                "clinica_nome": a.clinica.nome,
-                "clinica_cidade": a.clinica.cidade,
-                "paciente_nome": a.paciente.nome,
-                "paciente_cpf": a.paciente.cpf,
-                "profissional_nome": a.profissional.nome,
-                "profissional_registro": a.profissional.registro_profissional,
-                "data": a.data,
-                "hora_inicio": a.horario_inicio,
-                "hora_fim": a.horario_fim,
-                "tipo_atendimento_nome": a.tipo_atendimento.nome,
-                "valor": a.valor,
-                "custo_procedimentos": a.calcular_custo_total_procedimentos(),
-                "valor_restante": a.calcular_valor_restante(),
-                "procedimentos": [{"descricao": p.descricao, "custo": p.custo} for p in a.procedimentos],
-            }
-            self.__tela_atendimento.mostrar_atendimento(dados)
+        self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=False)
 
     def excluir_atendimento(self):
         atendimentos = self.__atendimento_dao.get_all()

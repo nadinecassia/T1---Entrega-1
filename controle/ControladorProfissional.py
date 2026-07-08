@@ -30,11 +30,7 @@ class ControladorProfissional:
         if cpf is None:
             return None
 
-        if cpf < 0 or cpf >= len(profissionais):
-            self.__tela_profissional.mostrar_mensagem("Profissional não encontrado.")
-            return None
-        
-        return profissionais[cpf]
+        return self.__profissional_dao.get(cpf)
     
 
     def selecionar_profissional_para_procedimento(self):

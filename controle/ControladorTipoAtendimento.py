@@ -31,6 +31,17 @@ class ControladorTipoAtendimento:
                 return tipo
         return None
     
+    def selecionar_tipo_por_tabela(self):
+        tipos = self.__tipo_atendimento_dao.get_all()
+        if not tipos:
+            self.__tela_tipo_atendimento.mostrar_mensagem("Nenhum tipo cadastrado.")
+            return None
+        
+        codigo = self.__tela_tipo_atendimento.tabela_tipos(tipos, selecionar=True)
+        if codigo is None:
+            return None
+        return self.__tipo_atendimento_dao.get(codigo)
+    
     def incluir_tipo(self):
         dados_tipo = self.__tela_tipo_atendimento.pegar_dados()
 

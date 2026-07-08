@@ -98,7 +98,8 @@ class TelaAtendimentoGUI(AbstractTelaGUI):
 
     def mostrar_atendimento(self, dados_atendimento: dict):
         procs = dados_atendimento.get('procedimentos', [])
-        texto_procs = ", ".join([p.descricao for p in procs]) if procs else "Nenhum"
+
+        texto_procs = ", ".join([p['descricao'] for p in procs]) if procs else "Nenhum"
 
         mensagem = (
             f"DATA: {dados_atendimento['data'].strftime('%d/%m/%Y')}\n"

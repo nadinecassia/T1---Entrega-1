@@ -14,6 +14,17 @@ class ControladorClinica:
 
     def pegar_clinica_por_nome(self, nome: str) -> Clinica | None:
         return self.__clinica_dao.get(nome)
+    
+    def selecionar_clinica_por_tabela(self):
+        clinicas = self.__clinica_dao.get_all()
+        if not clinicas:
+            self.__tela_clinica.mostrar_mensagem("Nenhuma clínica cadastrada.")
+            return None
+        
+        nome = self.__tela_clinica.tabela_clinicas(clinicas, selecionar=True)
+        if nome is None:
+            return None
+        return self.pegar_clinica_por_nome(nome)
 
     def incluir_clinica(self):
         dados_clinica = self.__tela_clinica.pegar_dados()
