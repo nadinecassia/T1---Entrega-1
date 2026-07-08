@@ -83,6 +83,3 @@ class TelaTipoAtendimentoGUI(AbstractTelaGUI):
                 indice = valores["tabela"][0]
                 window.close()
                 return tipos[indice].codigo
-
-    def mostrar_msg(self, msg: str):
-        self.mostrar_mensagem(msg)

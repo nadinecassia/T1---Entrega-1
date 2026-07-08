@@ -22,7 +22,7 @@ class ControladorAtendimento:
         atendimentos = self.__atendimento_dao.get_all()
 
         if not atendimentos:
-            self.__tela_atendimento.mostrar_msg("Nenhum atendimento cadastrado.")
+            self.__tela_atendimento.mostrar_mensagem("Nenhum atendimento cadastrado.")
             return None
 
         busca = self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=True)
@@ -34,7 +34,7 @@ class ControladorAtendimento:
         atendimento = self.__atendimento_dao.get(cpf_busca, data_busca)
 
         if atendimento is None:
-            self.__tela_atendimento.mostrar_msg("Erro: Atendimento não encontrado.")
+            self.__tela_atendimento.mostrar_mensagem("Erro: Atendimento não encontrado.")
             return None
 
         return atendimento
@@ -61,11 +61,11 @@ class ControladorAtendimento:
             return
 
         if paciente.calcular_idade() < 18:
-            self.__tela_atendimento.mostrar_msg(f"O paciente {paciente.nome} tem {paciente.calcular_idade()} anos. Somente maiores de 18 anos podem realizar atendimentos de forma independente!")
+            self.__tela_atendimento.mostrar_mensagem(f"O paciente {paciente.nome} tem {paciente.calcular_idade()} anos. Somente maiores de 18 anos podem realizar atendimentos de forma independente!")
             return
 
         if not clinica.esta_aberta(dados_tela["hora_inicio"], dados_tela["hora_fim"]):
-            self.__tela_atendimento.mostrar_msg(f"REJEITADO: Horário fora do funcionamento da clínica!")
+            self.__tela_atendimento.mostrar_mensagem(f"REJEITADO: Horário fora do funcionamento da clínica!")
             return
 
         novo_atendimento = Atendimento(
@@ -80,12 +80,12 @@ class ControladorAtendimento:
         )
 
         self.__atendimento_dao.add(novo_atendimento)
-        self.__tela_atendimento.mostrar_msg("Atendimento agendado com sucesso!")
+        self.__tela_atendimento.mostrar_mensagem("Atendimento agendado com sucesso!")
 
     def alterar_atendimento(self):
         atendimentos = self.__atendimento_dao.get_all()
         if not atendimentos:
-            self.__tela_atendimento.mostrar_msg("Nenhum atendimento agendado.")
+            self.__tela_atendimento.mostrar_mensagem("Nenhum atendimento agendado.")
             return
 
         busca = self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=True)
@@ -97,7 +97,7 @@ class ControladorAtendimento:
         atendimento = self.__atendimento_dao.get(cpf_busca, data_busca)
 
         if atendimento is None:
-            self.__tela_atendimento.mostrar_msg("ERRO: Atendimento não localizado.")
+            self.__tela_atendimento.mostrar_mensagem("ERRO: Atendimento não localizado.")
             return
 
         novos_dados = self.__tela_atendimento.pegar_dados()
@@ -112,12 +112,12 @@ class ControladorAtendimento:
         atendimento.valor = novos_dados["valor"]
 
         self.__atendimento_dao.add(atendimento)
-        self.__tela_atendimento.mostrar_msg("Atendimento alterado com sucesso!")
+        self.__tela_atendimento.mostrar_mensagem("Atendimento alterado com sucesso!")
 
     def registrar_procedimento_em_atendimento(self):
         atendimentos = self.__atendimento_dao.get_all()
         if not atendimentos:
-            self.__tela_atendimento.mostrar_msg("Nenhum atendimento agendado.")
+            self.__tela_atendimento.mostrar_mensagem("Nenhum atendimento agendado.")
             return
 
         busca = self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=True)
@@ -129,7 +129,7 @@ class ControladorAtendimento:
         atendimento = self.__atendimento_dao.get(cpf_busca, data_busca)
 
         if atendimento is None:
-            self.__tela_atendimento.mostrar_msg("ERRO: Atendimento não localizado!")
+            self.__tela_atendimento.mostrar_mensagem("ERRO: Atendimento não localizado!")
             return
 
         procedimento = self.__controlador_principal.controlador_procedimento.selecionar_procedimento_para_atendimento()
@@ -138,12 +138,12 @@ class ControladorAtendimento:
 
         atendimento.add_procedimento(procedimento)
         self.__atendimento_dao.update(atendimento)
-        self.__tela_atendimento.mostrar_msg(f"Procedimento '{procedimento.descricao}' adicionado!")
+        self.__tela_atendimento.mostrar_mensagem(f"Procedimento '{procedimento.descricao}' adicionado!")
 
     def listar_atendimentos(self):
         atendimentos = self.__atendimento_dao.get_all()
         if not atendimentos:
-            self.__tela_atendimento.mostrar_msg("Nenhum atendimento agendado!")
+            self.__tela_atendimento.mostrar_mensagem("Nenhum atendimento agendado!")
             return
 
         self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=False)
@@ -151,7 +151,7 @@ class ControladorAtendimento:
     def excluir_atendimento(self):
         atendimentos = self.__atendimento_dao.get_all()
         if not atendimentos:
-            self.__tela_atendimento.mostrar_msg("Nenhum atendimento agendado.")
+            self.__tela_atendimento.mostrar_mensagem("Nenhum atendimento agendado.")
             return
 
         busca = self.__tela_atendimento.tabela_atendimentos(atendimentos, selecionar=True)
@@ -160,7 +160,7 @@ class ControladorAtendimento:
 
         cpf_busca, data_busca = busca
         self.__atendimento_dao.remove(cpf_busca, data_busca)
-        self.__tela_atendimento.mostrar_msg("Atendimento excluído com sucesso!")
+        self.__tela_atendimento.mostrar_mensagem("Atendimento excluído com sucesso!")
 
     def abrir_tela(self):
         while True:

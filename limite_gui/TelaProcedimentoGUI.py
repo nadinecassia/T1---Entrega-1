@@ -99,6 +99,3 @@ class TelaProcedimentoGUI(AbstractTelaGUI):
             f"PROFISSIONAL RESP.: {dados_procedimento.get('profissional_nome', 'Não informado')}"
         )
         sg.popup(mensagem, title="Detalhes do Procedimento")
-
-    def mostrar_msg(self, msg: str):
-        self.mostrar_mensagem(msg)

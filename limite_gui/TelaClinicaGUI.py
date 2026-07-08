@@ -118,5 +118,3 @@ class TelaClinicaGUI(AbstractTelaGUI):
                 window.close()
                 return clinicas[indice].nome
 
-    def mostrar_msg(self, msg: str):
-        self.mostrar_mensagem(msg)

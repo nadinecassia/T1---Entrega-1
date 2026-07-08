@@ -51,7 +51,7 @@ class ControladorTipoAtendimento:
         tipo_existente = self.pegar_tipo_por_nome(dados_tipo["nome"])
 
         if tipo_existente is not None:
-            self.__tela_tipo_atendimento.mostrar_msg("Tipo de atendimento já cadastrado")
+            self.__tela_tipo_atendimento.mostrar_mensagem("Tipo de atendimento já cadastrado")
             return
             
         codigo = self.__gerar_codigo()
@@ -62,7 +62,7 @@ class ControladorTipoAtendimento:
         )
 
         self.__tipo_atendimento_dao.add(novo_tipo)
-        self.__tela_tipo_atendimento.mostrar_msg("Tipo de atendimento cadastrado com sucesso!")
+        self.__tela_tipo_atendimento.mostrar_mensagem("Tipo de atendimento cadastrado com sucesso!")
 
     def alterar_tipo_atendimento(self) -> None:
         tipos = self.__tipo_atendimento_dao.get_all()

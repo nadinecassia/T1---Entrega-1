@@ -31,9 +31,6 @@ class TelaRelatorioGUI(AbstractTelaGUI):
             
         return evento
 
-    def mostrar_msg(self, msg: str):
-        self.mostrar_mensagem(msg)
-
     def exibir_clinicas_mais_atendidas(self, lista_clinicas: list):
         texto = "=== RELATÓRIO: CLÍNICAS COM MAIOR NÚMERO DE ATENDIMENTOS ===\n\n"
         for posicao, item in enumerate(lista_clinicas, start=1):

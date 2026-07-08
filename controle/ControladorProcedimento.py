@@ -19,7 +19,7 @@ class ControladorProcedimento:
         procedimentos = self.__procedimento_dao.get_all()
 
         if not procedimentos:
-            self.__tela_procedimento.mostrar_msg("ERRO: Nenhum procedimento cadastrado!")
+            self.__tela_procedimento.mostrar_mensagem("ERRO: Nenhum procedimento cadastrado!")
             return None
 
         descricao = self.__tela_procedimento.tabela_procedimentos(procedimentos, selecionar=True)
@@ -27,7 +27,7 @@ class ControladorProcedimento:
         procedimento_selecionado = self.__procedimento_dao.get(descricao)
 
         if procedimento_selecionado is None:
-            self.__tela_procedimento.mostrar_msg("ERRO: Procedimento não encontrado!")
+            self.__tela_procedimento.mostrar_mensagem("ERRO: Procedimento não encontrado!")
             return None
 
         return procedimento_selecionado
@@ -39,10 +39,10 @@ class ControladorProcedimento:
             if p.descricao == descricao:
                 atendimento.procedimentos.remove(p)
                 self.__controlador_principal.controlador_atendimento.atualizar_atendimento_dao(atendimento)
-                self.__tela_procedimento.mostrar_msg("Procedimento removido do atendimento!")
+                self.__tela_procedimento.mostrar_mensagem("Procedimento removido do atendimento!")
                 return
         
-        self.__tela_procedimento.mostrar_msg("Procedimento não encontrado neste atendimento.")
+        self.__tela_procedimento.mostrar_mensagem("Procedimento não encontrado neste atendimento.")
 
     def incluir_procedimento(self):
         dados_procedimento = self.__tela_procedimento.pegar_dados()
@@ -51,7 +51,7 @@ class ControladorProcedimento:
             return
 
         if self.__procedimento_dao.get(dados_procedimento["descricao"]) is not None:
-            self.__tela_procedimento.mostrar_msg("Já existe um procedimento com essa descrição!")
+            self.__tela_procedimento.mostrar_mensagem("Já existe um procedimento com essa descrição!")
             return
 
         profissional = (
@@ -61,7 +61,7 @@ class ControladorProcedimento:
         )
 
         if profissional is None:
-            self.__tela_procedimento.mostrar_msg("ERRO: Profissional inválido!")
+            self.__tela_procedimento.mostrar_mensagem("ERRO: Profissional inválido!")
             return
 
         novo_procedimento = Procedimento(
@@ -71,12 +71,12 @@ class ControladorProcedimento:
         )
 
         self.__procedimento_dao.add(novo_procedimento)
-        self.__tela_procedimento.mostrar_msg("Procedimento cadastrado com sucesso!")
+        self.__tela_procedimento.mostrar_mensagem("Procedimento cadastrado com sucesso!")
 
     def alterar_procedimento(self):
         procedimentos = self.__procedimento_dao.get_all()
         if not procedimentos:
-            self.__tela_procedimento.mostrar_msg("Nenhum procedimento cadastrado.")
+            self.__tela_procedimento.mostrar_mensagem("Nenhum procedimento cadastrado.")
             return
 
         descricao_busca = self.__tela_procedimento.tabela_procedimentos(procedimentos, selecionar=True)
@@ -96,12 +96,12 @@ class ControladorProcedimento:
         procedimento.custo = dados_novos["custo"]
 
         self.__procedimento_dao.update(procedimento)
-        self.__tela_procedimento.mostrar_msg("Procedimento alterado com sucesso!")
+        self.__tela_procedimento.mostrar_mensagem("Procedimento alterado com sucesso!")
 
     def excluir_procedimento(self):
         procedimentos = self.__procedimento_dao.get_all()
         if not procedimentos:
-            self.__tela_procedimento.mostrar_msg("Nenhum procedimento cadastrado.")
+            self.__tela_procedimento.mostrar_mensagem("Nenhum procedimento cadastrado.")
             return
 
         descricao_busca = self.__tela_procedimento.tabela_procedimentos(procedimentos, selecionar=True)
@@ -109,12 +109,12 @@ class ControladorProcedimento:
             return
 
         self.__procedimento_dao.remove(descricao_busca)
-        self.__tela_procedimento.mostrar_msg("Procedimento excluído!")
+        self.__tela_procedimento.mostrar_mensagem("Procedimento excluído!")
 
     def listar_procedimentos(self):
         procedimentos = self.__procedimento_dao.get_all()
         if not procedimentos:
-            self.__tela_procedimento.mostrar_msg("Nenhum procedimento cadastrado!")
+            self.__tela_procedimento.mostrar_mensagem("Nenhum procedimento cadastrado!")
             return
 
         self.__tela_procedimento.tabela_procedimentos(procedimentos, selecionar=False)

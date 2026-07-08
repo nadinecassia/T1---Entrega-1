@@ -112,6 +112,3 @@ class TelaAtendimentoGUI(AbstractTelaGUI):
             f"PROCEDIMENTOS: {texto_procs}"
         )
         sg.popup(mensagem, title="Detalhes do Atendimento")
-
-    def mostrar_msg(self, msg: str):
-        self.mostrar_mensagem(msg)

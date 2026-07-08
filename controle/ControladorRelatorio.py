@@ -15,7 +15,7 @@ class ControladorRelatorio:
         )
 
         if len(lista_atendimentos) == 0:
-            self.__tela_relatorio.mostrar_msg(
+            self.__tela_relatorio.mostrar_mensagem(
                 "Não há atendimentos registrados para gerar estatísticas."
             )
             return
@@ -43,7 +43,7 @@ class ControladorRelatorio:
         lista_atendimentos = self.__controlador_principal.controlador_atendimento.atendimentos
 
         if len(lista_atendimentos) == 0:
-            self.__tela_relatorio.mostrar_msg("Não há atendimentos registrados para gerar estatísticas.")
+            self.__tela_relatorio.mostrar_mensagem("Não há atendimentos registrados para gerar estatísticas.")
             return
 
         atendimento_mais_caro = None
@@ -80,7 +80,7 @@ class ControladorRelatorio:
         )
 
         if len(lista_atendimentos) == 0:
-            self.__tela_relatorio.mostrar_msg(
+            self.__tela_relatorio.mostrar_mensagem(
                 "Não há atendimentos com procedimentos para gerar relatórios."
             )
             return
@@ -94,7 +94,7 @@ class ControladorRelatorio:
                     contagem_procedimentos[proc.descricao] = 1
 
         if len(contagem_procedimentos) == 0:
-            self.__tela_relatorio.mostrar_msg(
+            self.__tela_relatorio.mostrar_mensagem(
                 "Nenhum procedimento foi realizado nos atendimentos até agora."
             )
             return
@@ -113,7 +113,7 @@ class ControladorRelatorio:
         )
 
         if len(lista_procedimentos) == 0:
-            self.__tela_relatorio.mostrar_msg(
+            self.__tela_relatorio.mostrar_mensagem(
                 "Não há procedimentos cadastrados no sistema."
             )
             return
