@@ -119,7 +119,7 @@ class TelaAtendimentoGUI(AbstractTelaGUI):
             f"TIPO: {dados['tipo_atendimento_nome']} | VALOR BASE: R$ {dados['valor']:.2f}\n"
             f"CUSTO DOS PROCEDIMENTOS: R$ {dados['custo_procedimentos']:.2f}\n"
             f"VALOR RESTANTE A PAGAR: R$ {dados['valor_restante']:.2f}\n\n"
-            f"- PROCEDIMENTOS -\n"
+            f"PROCEDIMENTOS\n"
             f"{texto_procs}"
         )
 

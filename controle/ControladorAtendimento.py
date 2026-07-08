@@ -99,6 +99,12 @@ class ControladorAtendimento:
         if atendimento is None:
             self.__tela_atendimento.mostrar_mensagem("Erro: Atendimento não localizado.")
             return
+        
+        total_atendimento = atendimento.valor + atendimento.calcular_custo_total_procedimentos()
+
+        total_pago = sum(p.valor_pago for p in atendimento.pagamentos)
+
+        valor_restante = total_atendimento - total_pago
 
         dados_detalhados = {
             "clinica_nome": atendimento.clinica.nome,
@@ -113,7 +119,7 @@ class ControladorAtendimento:
             "tipo_atendimento_nome": atendimento.tipo_atendimento.nome,
             "valor": atendimento.valor,
             "custo_procedimentos": atendimento.calcular_custo_total_procedimentos(),
-            "valor_restante": atendimento.valor + atendimento.calcular_custo_total_procedimentos(), 
+            "valor_restante": valor_restante, 
             "procedimentos": [{"descricao": p.descricao, "custo": p.custo} for p in atendimento.procedimentos]
         }
 
