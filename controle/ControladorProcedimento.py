@@ -8,6 +8,10 @@ class ControladorProcedimento:
         self.__procedimento_dao = ProcedimentoDAO()
         self.__tela_procedimento = TelaProcedimentoGUI(self)
 
+    @property
+    def procedimentos(self):
+        return self.__procedimento_dao.get_all()
+
     def iniciar(self):
         self.abrir_tela()
 
