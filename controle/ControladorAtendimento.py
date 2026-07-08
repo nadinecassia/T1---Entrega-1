@@ -38,6 +38,49 @@ class ControladorAtendimento:
             return None
 
         return atendimento
+    
+    def incluir_atendimento(self):
+        clinica = self.__controlador_principal.controlador_clinica.selecionar_clinica_por_tabela()
+        if clinica is None:
+            return
+
+        paciente = self.__controlador_principal.controlador_paciente.selecionar_paciente_para_atendimento()
+        if paciente is None:
+            return
+
+        profissional = self.__controlador_principal.controlador_profissional.selecionar_profissional_para_atendimento()
+        if profissional is None:
+            return
+
+        tipo_atendimento = self.__controlador_principal.controlador_tipo_atendimento.selecionar_tipo_por_tabela()
+        if tipo_atendimento is None:
+            return
+
+        dados_tela = self.__tela_atendimento.abrir_janela_cadastro()
+        if dados_tela is None:
+            return
+
+        if paciente.calcular_idade() < 18:
+            self.__tela_atendimento.mostrar_mensagem(f"O paciente {paciente.nome} tem {paciente.calcular_idade()} anos. Somente maiores de 18 anos podem realizar atendimentos de forma independente!")
+            return
+
+        if not clinica.esta_aberta(dados_tela["hora_inicio"], dados_tela["hora_fim"]):
+            self.__tela_atendimento.mostrar_mensagem("REJEITADO: Horário fora do funcionamento da clínica!")
+            return
+
+        novo_atendimento = Atendimento(
+            data=dados_tela["data"],
+            horario_inicio=dados_tela["hora_inicio"],
+            horario_fim=dados_tela["hora_fim"],
+            tipo_atendimento=tipo_atendimento,
+            valor=dados_tela["valor"],
+            clinica=clinica,
+            paciente=paciente,
+            profissional=profissional,
+        )
+
+        self.__atendimento_dao.add(novo_atendimento)
+        self.__tela_atendimento.mostrar_mensagem("Atendimento agendado com sucesso!")
 
     def listar_atendimentos(self):
         atendimentos = self.__atendimento_dao.get_all()
