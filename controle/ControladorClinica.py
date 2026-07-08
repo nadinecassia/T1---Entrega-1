@@ -27,7 +27,7 @@ class ControladorClinica:
         return self.pegar_clinica_por_nome(nome)
 
     def incluir_clinica(self):
-        dados_clinica = self.__tela_clinica.pegar_dados()
+        dados_clinica = self.__tela_clinica.abrir_janela_cadastro()
 
         if dados_clinica is None:
             return
@@ -54,18 +54,23 @@ class ControladorClinica:
             return
 
         nome_busca = self.__tela_clinica.tabela_clinicas(clinicas, selecionar=True)
-
-        if nome_busca is None:
-            return
+        if nome_busca is None: return
 
         clinica = self.__clinica_dao.get(nome_busca)
 
-        dados_novos = self.__tela_clinica.pegar_dados()
-        if dados_novos is None:
-            return
+        dados_atuais = {
+            "nome": clinica.nome,
+            "descricao": clinica.descricao,
+            "cidade": clinica.cidade,
+            "horario_aberto": clinica.horario_aberto,
+            "horario_fechado": clinica.horario_fechado
+        }
+
+        dados_novos = self.__tela_clinica.abrir_janela_cadastro(dados_antigos=dados_atuais)
+        if dados_novos is None: return
 
         self.__clinica_dao.remove(nome_busca)
-
+        
         clinica.nome = dados_novos["nome"]
         clinica.descricao = dados_novos["descricao"]
         clinica.cidade = dados_novos["cidade"]
@@ -73,7 +78,6 @@ class ControladorClinica:
         clinica.horario_fechado = dados_novos["horario_fechado"]
 
         self.__clinica_dao.add(clinica)
-
         self.__tela_clinica.mostrar_mensagem("Clínica alterada com sucesso!")
 
     def excluir_clinica(self):

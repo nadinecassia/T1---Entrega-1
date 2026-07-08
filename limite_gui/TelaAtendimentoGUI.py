@@ -31,14 +31,19 @@ class TelaAtendimentoGUI(AbstractTelaGUI):
             return "Voltar"
             
         return evento
+    
+    def abrir_janela_cadastro(self, dados_antigos=None):
+        data_p = dados_antigos["data"].strftime("%d/%m/%Y") if dados_antigos else ""
+        h_inicio_p = dados_antigos["hora_inicio"].strftime("%H:%M") if dados_antigos else ""
+        h_fim_p = dados_antigos["hora_fim"].strftime("%H:%M") if dados_antigos else ""
+        valor_p = str(dados_antigos["valor"]) if dados_antigos else ""
 
-    def pegar_dados(self) -> dict:
         layout = [
             [sg.Text('Dados do Atendimento', font=("Arial", 18, "bold"), justification="center", expand_x=True)],
-            [sg.Text('Data (DD/MM/AAAA):', size=(20, 1)), sg.InputText(key='data')],
-            [sg.Text('Hora Início (HH:MM):', size=(20, 1)), sg.InputText(key='hora_inicio')],
-            [sg.Text('Hora Fim (HH:MM):', size=(20, 1)), sg.InputText(key='hora_fim')],
-            [sg.Text('Valor (R$):', size=(20, 1)), sg.InputText(key='valor')],
+            [sg.Text('Data (DD/MM/AAAA):', size=(20, 1)), sg.InputText(default_text=data_p, key='data')],
+            [sg.Text('Hora Início (HH:MM):', size=(20, 1)), sg.InputText(default_text=h_inicio_p, key='hora_inicio')],
+            [sg.Text('Hora Fim (HH:MM):', size=(20, 1)), sg.InputText(default_text=h_fim_p, key='hora_fim')],
+            [sg.Text('Valor (R$):', size=(20, 1)), sg.InputText(default_text=valor_p, key='valor')],
             [sg.Button('Confirmar', key='Confirmar'), sg.Button('Cancelar', key='Cancelar')]
         ]
         
@@ -46,7 +51,6 @@ class TelaAtendimentoGUI(AbstractTelaGUI):
         
         while True:
             button, values = window.read()
-            
             if button in (None, 'Cancelar'):
                 window.close()
                 return None
@@ -95,20 +99,28 @@ class TelaAtendimentoGUI(AbstractTelaGUI):
                 indice = valores["tabela"][0]
                 window.close()
                 return (atendimentos[indice].paciente.cpf, atendimentos[indice].data)
-
-    def mostrar_atendimento(self, dados_atendimento: dict):
-        procs = dados_atendimento.get('procedimentos', [])
-
-        texto_procs = ", ".join([p['descricao'] for p in procs]) if procs else "Nenhum"
+    
+    def mostrar_atendimento(self, dados: dict):
+        procs = dados.get('procedimentos', [])
+        texto_procs = ""
+        if procs:
+            for p in procs:
+                texto_procs += f" -> {p['descricao']} (R$ {p['custo']:.2f})\n"
+        else:
+            texto_procs = "Nenhum procedimento realizado.\n"
 
         mensagem = (
-            f"DATA: {dados_atendimento['data'].strftime('%d/%m/%Y')}\n"
-            f"HORÁRIO: {dados_atendimento['hora_inicio'].strftime('%H:%M')} às {dados_atendimento['hora_fim'].strftime('%H:%M')}\n"
-            f"PACIENTE: {dados_atendimento['paciente_nome']} (CPF: {dados_atendimento['paciente_cpf']})\n"
-            f"CLÍNICA: {dados_atendimento['clinica_nome']}\n"
-            f"PROFISSIONAL: {dados_atendimento['profissional_nome']}\n"
-            f"TIPO: {dados_atendimento['tipo_atendimento_nome']}\n"
-            f"VALOR: R$ {dados_atendimento['valor']:.2f}\n"
-            f"PROCEDIMENTOS: {texto_procs}"
+            f"DETALHES DO ATENDIMENTO\n\n"
+            f"CLÍNICA: {dados['clinica_nome']} ({dados['clinica_cidade']})\n"
+            f"PACIENTE: {dados['paciente_nome']} | CPF: {dados['paciente_cpf']}\n"
+            f"PROFISSIONAL: {dados['profissional_nome']} | Registro: {dados['profissional_registro']}\n"
+            f"DATA: {dados['data'].strftime('%d/%m/%Y')}\n"
+            f"HORÁRIO: {dados['horario_inicio'].strftime('%H:%M')} até {dados['horario_fim'].strftime('%H:%M')}\n"
+            f"TIPO: {dados['tipo_atendimento_nome']} | VALOR BASE: R$ {dados['valor']:.2f}\n"
+            f"CUSTO DOS PROCEDIMENTOS: R$ {dados['custo_procedimentos']:.2f}\n"
+            f"VALOR RESTANTE A PAGAR: R$ {dados['valor_restante']:.2f}\n\n"
+            f"- PROCEDIMENTOS -\n"
+            f"{texto_procs}"
         )
-        sg.popup(mensagem, title="Detalhes do Atendimento")
+
+        sg.popup_scrolled(mensagem, title="Detalhes do Atendimento", size=(60, 15))

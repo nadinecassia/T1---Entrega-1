@@ -43,23 +43,18 @@ class ControladorTipoAtendimento:
         return self.__tipo_atendimento_dao.get(codigo)
     
     def incluir_tipo(self):
-        dados_tipo = self.__tela_tipo_atendimento.pegar_dados()
+        dados_tipo = self.__tela_tipo_atendimento.abrir_janela_cadastro()
 
         if dados_tipo is None:
             return
 
         tipo_existente = self.pegar_tipo_por_nome(dados_tipo["nome"])
-
         if tipo_existente is not None:
             self.__tela_tipo_atendimento.mostrar_mensagem("Tipo de atendimento já cadastrado")
             return
             
         codigo = self.__gerar_codigo()
-        novo_tipo = TipoAtendimento(
-            codigo,
-            dados_tipo["nome"],
-            dados_tipo["descricao"],
-        )
+        novo_tipo = TipoAtendimento(codigo, dados_tipo["nome"], dados_tipo["descricao"])
 
         self.__tipo_atendimento_dao.add(novo_tipo)
         self.__tela_tipo_atendimento.mostrar_mensagem("Tipo de atendimento cadastrado com sucesso!")
@@ -75,8 +70,14 @@ class ControladorTipoAtendimento:
             return
         
         tipo = self.__tipo_atendimento_dao.get(codigo_busca)
+
+        dados_atuais = {
+            "nome": tipo.nome,
+            "descricao": tipo.descricao
+        }
+
+        novos_dados = self.__tela_tipo_atendimento.abrir_janela_cadastro(dados_antigos=dados_atuais)
         
-        novos_dados = self.__tela_tipo_atendimento.pegar_dados()
         if novos_dados is None:
             return
             

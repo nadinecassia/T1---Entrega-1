@@ -45,7 +45,7 @@ class ControladorProcedimento:
         self.__tela_procedimento.mostrar_mensagem("Procedimento não encontrado neste atendimento.")
 
     def incluir_procedimento(self):
-        dados_procedimento = self.__tela_procedimento.pegar_dados()
+        dados_procedimento = self.__tela_procedimento.abrir_janela_cadastro()
 
         if dados_procedimento is None:
             return
@@ -54,14 +54,8 @@ class ControladorProcedimento:
             self.__tela_procedimento.mostrar_mensagem("Já existe um procedimento com essa descrição!")
             return
 
-        profissional = (
-            self.__controlador_principal
-            .controlador_profissional
-            .selecionar_profissional_para_procedimento()
-        )
-
+        profissional = self.__controlador_principal.controlador_profissional.selecionar_profissional_para_procedimento()
         if profissional is None:
-            self.__tela_procedimento.mostrar_mensagem("ERRO: Profissional inválido!")
             return
 
         novo_procedimento = Procedimento(
@@ -85,7 +79,12 @@ class ControladorProcedimento:
 
         procedimento = self.__procedimento_dao.get(descricao_busca)
 
-        dados_novos = self.__tela_procedimento.pegar_dados()
+        dados_atuais = {
+            "descricao": procedimento.descricao,
+            "custo": procedimento.custo
+        }
+
+        dados_novos = self.__tela_procedimento.abrir_janela_cadastro(dados_antigos=dados_atuais)
         if dados_novos is None:
             return
 

@@ -34,14 +34,14 @@ class TelaProcedimentoGUI(AbstractTelaGUI):
             
         return evento
 
-    def pegar_dados(self) -> dict:
+    def abrir_janela_cadastro(self, dados_antigos=None):
+        desc_p = dados_antigos["descricao"] if dados_antigos else ""
+        custo_p = str(dados_antigos["custo"]) if dados_antigos else ""
+
         layout = [
-            [sg.Text(
-                'Dados do Procedimento',
-                font = ("Arial", 18, "bold"),justification = "center",
-                expand_x = True)],
-            [sg.Text('Descrição:'), sg.InputText(key='descricao')],
-            [sg.Text('Custo (R$):'), sg.InputText(key='custo')],
+            [sg.Text('Dados do Procedimento', font=("Arial", 18, "bold"), justification="center", expand_x=True)],
+            [sg.Text('Descrição:'), sg.InputText(default_text=desc_p, key='descricao')],
+            [sg.Text('Custo (R$):'), sg.InputText(default_text=custo_p, key='custo')],
             [sg.Button('Confirmar', key='Confirmar'), sg.Button('Cancelar', key='Cancelar')]
         ]
         

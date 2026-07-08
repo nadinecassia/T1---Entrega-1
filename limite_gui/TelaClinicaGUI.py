@@ -39,15 +39,20 @@ class TelaClinicaGUI(AbstractTelaGUI):
             
         return evento
 
-    def pegar_dados(self) -> dict:
+    def abrir_janela_cadastro(self, dados_antigos=None):
+        nome_p = dados_antigos["nome"] if dados_antigos else ""
+        desc_p = dados_antigos["descricao"] if dados_antigos else ""
+        cidade_p = dados_antigos["cidade"] if dados_antigos else ""
+        haberto_p = dados_antigos["horario_aberto"].strftime("%H:%M") if dados_antigos else ""
+        hfechado_p = dados_antigos["horario_fechado"].strftime("%H:%M") if dados_antigos else ""
+
         layout = [
-            [sg.Text('Dados da Clínica', 
-                     font = ("Arial", 18, "bold"),justification = "center",expand_x = True)],
-            [sg.Text('Nome:'), sg.InputText(key='nome')],
-            [sg.Text('Descrição:'), sg.InputText(key='descricao')],
-            [sg.Text('Cidade:'), sg.InputText(key='cidade')],
-            [sg.Text('Horário de abertura (HH:MM):'), sg.InputText(key='horario_aberto')],
-            [sg.Text('Horário de fechamento (HH:MM):'), sg.InputText(key='horario_fechado')],
+            [sg.Text('Dados da Clínica', font=("Arial", 18, "bold"), justification="center", expand_x=True)],
+            [sg.Text('Nome:'), sg.InputText(default_text=nome_p, key='nome')],
+            [sg.Text('Descrição:'), sg.InputText(default_text=desc_p, key='descricao')],
+            [sg.Text('Cidade:'), sg.InputText(default_text=cidade_p, key='cidade')],
+            [sg.Text('Horário de abertura (HH:MM):'), sg.InputText(default_text=haberto_p, key='horario_aberto')],
+            [sg.Text('Horário de fechamento (HH:MM):'), sg.InputText(default_text=hfechado_p, key='horario_fechado')],
             [sg.Button('Confirmar'), sg.Button('Cancelar')]
         ]
         
@@ -55,7 +60,6 @@ class TelaClinicaGUI(AbstractTelaGUI):
         
         while True:
             button, values = window.read()
-
             if button in (None, 'Cancelar'):
                 window.close()
                 return None
@@ -77,7 +81,6 @@ class TelaClinicaGUI(AbstractTelaGUI):
                 }
 
     def tabela_clinicas(self, clinicas, selecionar=False):
-        # Transforma a lista de objetos Clinica em uma lista de listas para a tabela
         dados = []
         for c in clinicas:
             dados.append([c.nome, c.descricao, c.cidade, 

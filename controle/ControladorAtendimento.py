@@ -56,7 +56,7 @@ class ControladorAtendimento:
         if tipo_atendimento is None:
             return
 
-        dados_tela = self.__tela_atendimento.pegar_dados()
+        dados_tela = self.__tela_atendimento.abrir_janela_cadastro()
         if dados_tela is None: 
             return
 
@@ -96,11 +96,14 @@ class ControladorAtendimento:
 
         atendimento = self.__atendimento_dao.get(cpf_busca, data_busca)
 
-        if atendimento is None:
-            self.__tela_atendimento.mostrar_mensagem("ERRO: Atendimento não localizado.")
-            return
+        dados_atuais = {
+            "data": atendimento.data,
+            "hora_inicio": atendimento.horario_inicio,
+            "hora_fim": atendimento.horario_fim,
+            "valor": atendimento.valor
+        }
 
-        novos_dados = self.__tela_atendimento.pegar_dados()
+        novos_dados = self.__tela_atendimento.abrir_janela_cadastro(dados_antigos=dados_atuais)
 
         if novos_dados is None: return
 

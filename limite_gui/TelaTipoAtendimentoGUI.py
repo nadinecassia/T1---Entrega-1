@@ -28,11 +28,14 @@ class TelaTipoAtendimentoGUI(AbstractTelaGUI):
             
         return evento
 
-    def pegar_dados(self) -> dict:
+    def abrir_janela_cadastro(self, dados_antigos=None):
+        nome_p = dados_antigos["nome"] if dados_antigos else ""
+        desc_p = dados_antigos["descricao"] if dados_antigos else ""
+
         layout = [
             [sg.Text('Dados do Tipo de Atendimento', font=("Arial", 15, "bold"))],
-            [sg.Text('Nome:', size=(10, 1)), sg.InputText(key='nome')],
-            [sg.Text('Descrição:', size=(10, 1)), sg.InputText(key='descricao')],
+            [sg.Text('Nome:', size=(10, 1)), sg.InputText(default_text=nome_p, key='nome')],
+            [sg.Text('Descrição:', size=(10, 1)), sg.InputText(default_text=desc_p, key='descricao')],
             [sg.Button('Confirmar', key='Confirmar'), sg.Button('Cancelar', key='Cancelar')]
         ]
         
@@ -53,7 +56,6 @@ class TelaTipoAtendimentoGUI(AbstractTelaGUI):
                 return {"nome": nome, "descricao": descricao}
     
     def tabela_tipos(self, tipos, selecionar=False):
-        # A chave no DAO é o código (int)
         dados = [[t.codigo, t.nome, t.descricao] for t in tipos]
         
         layout = [
