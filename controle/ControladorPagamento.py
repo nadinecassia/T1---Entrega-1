@@ -87,7 +87,7 @@ class ControladorPagamento:
             )
         
         elif modalidade == "PIX":
-            dados_pix = self.__tela_pagamento.pegar_dados_pix
+            dados_pix = self.__tela_pagamento.pegar_dados_pix()
 
             if dados_pix is None:
                 return

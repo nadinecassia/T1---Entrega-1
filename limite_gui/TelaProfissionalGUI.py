@@ -25,7 +25,7 @@ class TelaProfissionalGUI(AbstractTelaGUI):
         ]
 
         window = sg.Window(
-            "Profissionals",
+            "Profissionais",
             layout,
             size=(500, 450),
             element_justification="center",
@@ -151,7 +151,7 @@ class TelaProfissionalGUI(AbstractTelaGUI):
             ])
 
         window = sg.Window(
-            "Profissionals",
+            "Profissionais",
             layout,
             size=(900, 400)
         )
