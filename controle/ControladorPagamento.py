@@ -38,7 +38,7 @@ class ControladorPagamento:
             self.__tela_pagamento.mostrar_mensagem("Nenhum atendimento cadastrado.")
             return None
 
-        return self.__controlador_principal.controlador_atendimento.selecionar_atendimento
+        return self.__controlador_principal.controlador_atendimento.selecionar_atendimento()
 
 
     def remover_pagamento_do_atendimento(self, atendimento) -> None:
@@ -121,18 +121,6 @@ class ControladorPagamento:
             self.__pagamento_dao.add(pagamento)
 
             self.__tela_pagamento.mostrar_mensagem("Pagamento cadastrado com sucesso!")
-
-        pagamento = self.criar_pagamento_para_atendimento(atendimento)
-
-        if pagamento is None:
-            return
-
-        pagamento.processar_pagamento()
-
-        atendimento.add_pagamentos(pagamento)
-        self.__pagamento_dao.add(pagamento)
-
-        self.__tela_pagamento.mostrar_mensagem("Pagamento cadastrado com sucesso.")
 
     def listar_pagamentos(self) -> None:
         pagamentos = self.__pagamento_dao.get_all()

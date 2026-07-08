@@ -148,7 +148,7 @@ class TelaPagamentoGUI(AbstractTelaGUI):
                 pagamento.codigo,
                 pagamento.data.strftime("%d/%m/%Y"),
                 f"{pagamento.valor_pago: .2f}",
-                pagamento.modalidade,
+                self.__controlador.identificar_modalidade(pagamento),
                 pagamento.paciente.nome
             ])
 
@@ -208,4 +208,4 @@ class TelaPagamentoGUI(AbstractTelaGUI):
 
                 window.close()
 
-                return pagamentos[indice].cpf
+                return pagamentos[indice].codigo
